@@ -84,7 +84,10 @@ ui/
 
 | Список | Свайп                      | Детали                       |
 |--|----------------------------|------------------------------|
-|![details](https://github.com/user-attachments/assets/e2c69e37-c09b-422b-985c-30bf552d1119) | ![list](https://github.com/user-attachments/assets/64c49171-2f71-4b43-a8fd-e2f2d04a3631) | ![swipe](https://github.com/user-attachments/assets/be78fb1a-566f-4c70-aac0-950ca862f2d7) |
+|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/5d0fe997-0d8e-45f8-b6e5-bfc40548ee42" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/c7d893b7-9e54-4660-8b51-44633d6600af" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/2de0d29b-9038-457b-801f-37c60dbba6be" />|
+
+
+
 
 
 
