@@ -6,8 +6,8 @@ import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 
 // Из url "https://pokeapi.co/api/v2/ability/3/" достаём id
-fun AbilityEntryDto.toAbilityItem(): AbilityItem {
-    val id = url.trimEnd('/').substringAfterLast('/').toInt()
+fun AbilityEntryDto.toAbilityItemOrNull(): AbilityItem? {
+    val id = url.trimEnd('/').substringAfterLast('/').toIntOrNull() ?: return null
     return AbilityItem(id = id, name = name)
 }
 
