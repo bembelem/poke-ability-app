@@ -120,7 +120,7 @@ fun SwipeableAbilityItem(
             )
         }
     ) {
-        AbilityItem(
+        AbilityListItem(
             ability = ability,
             isFavourite = isFavourite,
             onClick = onClick
@@ -153,7 +153,7 @@ fun SwipeBackground(
 }
 
 @Composable
-fun AbilityItem(
+fun AbilityListItem(
     ability: AbilityItem,
     isFavourite: Boolean,
     onClick: () -> Unit
