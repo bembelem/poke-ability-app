@@ -13,7 +13,7 @@ fun AbilityEntryDto.toAbilityItemOrNull(): AbilityItem? {
 
 fun AbilityDto.toAbilityDetail(): AbilityDetail {
     val enEffect = effectEntries.firstOrNull {it.language.name == "en"}
-    val enFlavor = flavorTextEntries.firstOrNull {it.language.name == "en"}
+    val enFlavor = flavorTextEntries.lastOrNull { it.language.name == "en" }
     return AbilityDetail(
         id = id,
         name = name,
