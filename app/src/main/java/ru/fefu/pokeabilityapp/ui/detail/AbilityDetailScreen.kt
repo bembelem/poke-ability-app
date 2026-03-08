@@ -11,11 +11,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -107,14 +109,22 @@ fun AbilityDetailContent(detail: AbilityDetail) {
             }
         }
         item {
-            DetailCard(title = "Pokémon with this ability (${detail.pokemonList.size})") {
-                detail.pokemonList.forEach { name ->
-                    Text(
-                        text = "• ${name.replaceFirstChar { it.uppercase() }}",
-                        modifier = Modifier.padding(vertical = 2.dp)
-                    )
-                }
-            }
+            Text(
+                text = "Pokémon with this ability (${detail.pokemonList.size})",
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+
+        items(items = detail.pokemonList, key = { it }) { name ->
+            Text(
+                text = name.replaceFirstChar { it.uppercase() },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            )
+            HorizontalDivider()
         }
     }
 }
