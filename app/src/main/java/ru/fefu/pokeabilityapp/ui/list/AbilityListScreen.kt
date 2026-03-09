@@ -3,6 +3,7 @@ package ru.fefu.pokeabilityapp.ui.list
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -27,9 +28,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
 import ru.fefu.pokeabilityapp.ui.common.UiState
@@ -40,16 +43,13 @@ fun AbilityListScreen(
     onAbilityClick: (Int) -> Unit,
     viewModel: AbilityListViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val favourites by viewModel.favourites.collectAsStateWithLifecycle()
-
     Scaffold(
         topBar = {
             TopAppBar(title = { Text("POKE-ABILITY-MOD_B6_SWIPE_ACTIONS") })
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (val state = uiState) {
+            when (val state = viewModel.uiState) {
                 is UiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
@@ -60,12 +60,33 @@ fun AbilityListScreen(
                     )
                 }
                 is UiState.Content -> {
-                    AbilityList(
-                        abilities = state.data,
-                        favourites = favourites,
-                        onAbilityClick = onAbilityClick,
-                        onToggleFavourite = { viewModel.toggleFavourite(it) }
-                    )
+                    Column {
+                        FilterRow(
+                            filter = viewModel.filter,
+                            onFilterChange = { viewModel.onFilterChange(it) }
+                        )
+                        if (viewModel.visibleAbilities.isEmpty()) {
+                            Box(
+                                modifier = Modifier.fillMaxSize(),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = if (viewModel.filter == AbilityFilter.FAVOURITES)
+                                        "No favourites yet\nSwipe to add favourite"
+                                    else
+                                        "Nothing found",
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        } else {
+                            AbilityList(
+                                abilities = viewModel.visibleAbilities,
+                                favourites = viewModel.favourites,
+                                onAbilityClick = onAbilityClick,
+                                onToggleFavourite = { viewModel.toggleFavourite(it) }
+                            )
+                        }
+                    }
                 }
             }
         }

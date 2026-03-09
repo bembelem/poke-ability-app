@@ -1,13 +1,13 @@
 package ru.fefu.pokeabilityapp.ui.list
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.ui.common.UiState
@@ -17,32 +17,41 @@ import javax.inject.Inject
 class AbilityListViewModel @Inject constructor(
     private val repository: AbilityRepository
 ) : ViewModel() {
-    private val _uiState = MutableStateFlow<UiState<List<AbilityItem>>>(UiState.Loading)
-    val uiState: StateFlow<UiState<List<AbilityItem>>> = _uiState.asStateFlow()
 
-    // Для B6 - храним избранные id
-    private val _favourites = MutableStateFlow<Set<Int>>(emptySet())
-    val favourites: StateFlow<Set<Int>> = _favourites.asStateFlow()
+    var uiState by mutableStateOf<UiState<List<AbilityItem>>>(UiState.Loading)
+        private set
 
-    init {
-        loadAbilities()
-    }
+    private var items by mutableStateOf(emptyList<AbilityItem>())
+
+    var favourites by mutableStateOf(emptySet<Int>())
+        private set
+
+    var filter by mutableStateOf(AbilityFilter.ALL)
+        private set
+
+    val visibleAbilities: List<AbilityItem>
+        get() = when (filter) {
+            AbilityFilter.ALL -> items
+            AbilityFilter.FAVOURITES -> items.filter { it.id in favourites }
+        }
+
+    init { loadAbilities() }
+
     fun loadAbilities() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            uiState = UiState.Loading
             try {
-                val abilities = repository.getAbilities()
-                _uiState.value = UiState.Content(abilities)
+                items = repository.getAbilities()
+                uiState = UiState.Content(items)
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Unknown error")
+                uiState = UiState.Error(e.message ?: "Unknown error")
             }
         }
     }
 
+    fun onFilterChange(f: AbilityFilter) { filter = f }
+
     fun toggleFavourite(id: Int) {
-        _favourites.update { current ->
-            if (id in current) current - id else current + id
-        }
+        favourites = if (id in favourites) favourites - id else favourites + id
     }
 }
-
