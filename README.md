@@ -82,9 +82,12 @@ ui/
 
 ## Скриншоты
 
-| Список | Свайп                      | Детали                       |
+| Список | Свайп и спиок избранных                      | Детали                       |
 |--|----------------------------|------------------------------|
-|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/5d0fe997-0d8e-45f8-b6e5-bfc40548ee42" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/c7d893b7-9e54-4660-8b51-44633d6600af" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/2de0d29b-9038-457b-801f-37c60dbba6be" />|
+|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/ddc254da-72ca-4893-9d0a-04aec02275fb" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/05e04ebf-d38a-411e-a7df-3f29fcb35d40" />|<img width="576" height="1280" alt="image" src="https://github.com/user-attachments/assets/7e808fbc-99a1-49bb-a04c-0e42fa1f8d8c" />|
+
+
+
 
 
 
