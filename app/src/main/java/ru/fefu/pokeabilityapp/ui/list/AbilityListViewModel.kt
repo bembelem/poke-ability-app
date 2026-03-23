@@ -8,21 +8,19 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import ru.fefu.pokeabilityapp.data.local.FavouriteDao
-import ru.fefu.pokeabilityapp.data.local.FavouriteEntity
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
+import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
 import ru.fefu.pokeabilityapp.ui.common.UiState
 import javax.inject.Inject
 
 @HiltViewModel
 class AbilityListViewModel @Inject constructor(
     private val repository: AbilityRepository,
-    private val favouriteDao: FavouriteDao
+    private val favouriteRepository: FavouriteRepository
 ) : ViewModel() {
 
     var uiState by mutableStateOf<UiState<List<AbilityItem>>>(UiState.Loading)
@@ -30,8 +28,7 @@ class AbilityListViewModel @Inject constructor(
 
     private var items by mutableStateOf(emptyList<AbilityItem>())
 
-    val favourites: StateFlow<Set<Int>> = favouriteDao.getAll()
-        .map { list -> list.map { it.id }.toSet() }
+    val favourites: StateFlow<Set<Int>> = favouriteRepository.getAll()
         .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
     var filter by mutableStateOf(AbilityFilter.ALL)
@@ -62,9 +59,9 @@ class AbilityListViewModel @Inject constructor(
     fun toggleFavourite(id: Int) {
         viewModelScope.launch {
             if (id in favourites.value) {
-                favouriteDao.delete(FavouriteEntity(id))
+                favouriteRepository.remove(id)
             } else {
-                favouriteDao.insert(FavouriteEntity(id))
+                favouriteRepository.add(id)
             }
         }
     }
