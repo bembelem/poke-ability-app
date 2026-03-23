@@ -6,7 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.fefu.pokeabilityapp.data.local.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.FavouriteEntity
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
@@ -15,7 +21,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AbilityListViewModel @Inject constructor(
-    private val repository: AbilityRepository
+    private val repository: AbilityRepository,
+    private val favouriteDao: FavouriteDao
 ) : ViewModel() {
 
     var uiState by mutableStateOf<UiState<List<AbilityItem>>>(UiState.Loading)
@@ -23,8 +30,9 @@ class AbilityListViewModel @Inject constructor(
 
     private var items by mutableStateOf(emptyList<AbilityItem>())
 
-    var favourites by mutableStateOf(emptySet<Int>())
-        private set
+    val favourites: StateFlow<Set<Int>> = favouriteDao.getAll()
+        .map { list -> list.map { it.id }.toSet() }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, emptySet())
 
     var filter by mutableStateOf(AbilityFilter.ALL)
         private set
@@ -32,7 +40,7 @@ class AbilityListViewModel @Inject constructor(
     val visibleAbilities: List<AbilityItem>
         get() = when (filter) {
             AbilityFilter.ALL -> items
-            AbilityFilter.FAVOURITES -> items.filter { it.id in favourites }
+            AbilityFilter.FAVOURITES -> items.filter { it.id in favourites.value }
         }
 
     init { loadAbilities() }
@@ -52,6 +60,12 @@ class AbilityListViewModel @Inject constructor(
     fun onFilterChange(f: AbilityFilter) { filter = f }
 
     fun toggleFavourite(id: Int) {
-        favourites = if (id in favourites) favourites - id else favourites + id
+        viewModelScope.launch {
+            if (id in favourites.value) {
+                favouriteDao.delete(FavouriteEntity(id))
+            } else {
+                favouriteDao.insert(FavouriteEntity(id))
+            }
+        }
     }
 }

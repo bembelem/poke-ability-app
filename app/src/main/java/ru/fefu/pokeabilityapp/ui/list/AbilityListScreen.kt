@@ -24,12 +24,14 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
@@ -41,9 +43,11 @@ fun AbilityListScreen(
     onAbilityClick: (Int) -> Unit,
     viewModel: AbilityListViewModel = hiltViewModel()
 ) {
+    val favourites by viewModel.favourites.collectAsStateWithLifecycle()
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("POKE-ABILITY-MOD_B6_SWIPE_ACTIONS") })
+            TopAppBar(title = { Text("Poke Abilities") })
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
@@ -79,7 +83,7 @@ fun AbilityListScreen(
                         } else {
                             AbilityList(
                                 abilities = viewModel.visibleAbilities,
-                                favourites = viewModel.favourites,
+                                favourites = favourites,
                                 onAbilityClick = onAbilityClick,
                                 onToggleFavourite = { viewModel.toggleFavourite(it) }
                             )
