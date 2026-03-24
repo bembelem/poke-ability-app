@@ -1,16 +1,14 @@
 package ru.fefu.pokeabilityapp.ui.detail
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
-import ru.fefu.pokeabilityapp.ui.common.UiState
 import javax.inject.Inject
 
 
@@ -22,8 +20,8 @@ class AbilityDetailViewModel @Inject constructor(
 
     private val abilityId: Int = checkNotNull(savedStateHandle["abilityId"])
 
-    private val _uiState = MutableStateFlow<UiState<AbilityDetail>>(UiState.Loading)
-    val uiState: StateFlow<UiState<AbilityDetail>> = _uiState.asStateFlow()
+    var uiState by mutableStateOf<AbilityDetailUiState>(AbilityDetailUiState.Loading)
+        private set
 
     init {
         loadDetail()
@@ -31,12 +29,12 @@ class AbilityDetailViewModel @Inject constructor(
 
     fun loadDetail() {
         viewModelScope.launch {
-            _uiState.value = UiState.Loading
+            uiState = AbilityDetailUiState.Loading
             try {
                 val detail = repository.getAbilityById(abilityId)
-                _uiState.value = UiState.Content(detail)
+                uiState = AbilityDetailUiState.Content(detail)
             } catch (e: Exception) {
-                _uiState.value = UiState.Error(e.message ?: "Unknown error")
+                uiState = AbilityDetailUiState.Error(e.message ?: "Unknown error")
             }
         }
     }

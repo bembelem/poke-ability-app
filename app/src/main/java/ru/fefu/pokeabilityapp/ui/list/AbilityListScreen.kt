@@ -33,7 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
-import ru.fefu.pokeabilityapp.ui.common.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,26 +40,28 @@ fun AbilityListScreen(
     onAbilityClick: (Int) -> Unit,
     viewModel: AbilityListViewModel = hiltViewModel()
 ) {
+    val state = viewModel.uiState
+
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text("POKE-ABILITY-MOD_B6_SWIPE_ACTIONS") })
+            TopAppBar(title = { Text("Poke Abilities") })
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (val state = viewModel.uiState) {
-                is UiState.Loading -> {
+            when {
+                state.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                is UiState.Error -> {
+                state.errorMessage != null -> {
                     ErrorState(
-                        message = state.message,
+                        message = state.errorMessage,
                         onRetry = { viewModel.loadAbilities() }
                     )
                 }
-                is UiState.Content -> {
+                else -> {
                     Column {
                         FilterRow(
-                            filter = viewModel.filter,
+                            filter = state.filter,
                             onFilterChange = { viewModel.onFilterChange(it) }
                         )
                         if (viewModel.visibleAbilities.isEmpty()) {
@@ -69,17 +70,16 @@ fun AbilityListScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = if (viewModel.filter == AbilityFilter.FAVOURITES)
+                                    text = if (state.filter == AbilityFilter.FAVOURITES)
                                         "No favourites yet\nSwipe to add favourite"
-                                    else
-                                        "Nothing found",
+                                    else "Nothing found",
                                     textAlign = TextAlign.Center
                                 )
                             }
                         } else {
                             AbilityList(
                                 abilities = viewModel.visibleAbilities,
-                                favourites = viewModel.favourites,
+                                favourites = state.favourites,
                                 onAbilityClick = onAbilityClick,
                                 onToggleFavourite = { viewModel.toggleFavourite(it) }
                             )

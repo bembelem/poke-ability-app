@@ -1,9 +1,9 @@
 package ru.fefu.pokeabilityapp.ui.detail
 
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -25,15 +25,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
-import ru.fefu.pokeabilityapp.ui.common.UiState
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +39,7 @@ fun AbilityDetailScreen(
     onBack: () -> Unit,
     viewModel: AbilityDetailViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state = viewModel.uiState
 
     Scaffold(
         topBar = {
@@ -57,18 +54,18 @@ fun AbilityDetailScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (val state = uiState) {
-                is UiState.Loading -> {
+            when (state) {
+                is AbilityDetailUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                is UiState.Error -> {
+                is AbilityDetailUiState.Error -> {
                     ErrorState(
                         message = state.message,
                         onRetry = { viewModel.loadDetail() }
                     )
                 }
-                is UiState.Content -> {
-                    AbilityDetailContent(detail = state.data)
+                is AbilityDetailUiState.Content -> {
+                    AbilityDetailContent(detail = state.detail)
                 }
             }
         }
