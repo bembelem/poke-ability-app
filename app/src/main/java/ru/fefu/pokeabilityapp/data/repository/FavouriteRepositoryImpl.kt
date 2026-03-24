@@ -4,6 +4,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import ru.fefu.pokeabilityapp.data.local.FavouriteDao
 import ru.fefu.pokeabilityapp.data.local.FavouriteEntity
+import ru.fefu.pokeabilityapp.data.local.toDomain
+import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
 import javax.inject.Inject
 
@@ -11,12 +13,12 @@ class FavouriteRepositoryImpl @Inject constructor(
     private val dao: FavouriteDao
 ) : FavouriteRepository {
 
-    override fun getAll(): Flow<Set<Int>> =
-        dao.getAll().map { list -> list.map { it.id }.toSet() }
+    override suspend fun getAll(): List<AbilityItem> =
+        dao.getAll().map { it.toDomain() }
 
-    override suspend fun add(id: Int) =
-        dao.insert(FavouriteEntity(id))
+    override suspend fun add(item: AbilityItem) =
+        dao.insert(FavouriteEntity(id = item.id, name = item.name))
 
     override suspend fun remove(id: Int) =
-        dao.delete(FavouriteEntity(id))
+        dao.deleteById(id)
 }

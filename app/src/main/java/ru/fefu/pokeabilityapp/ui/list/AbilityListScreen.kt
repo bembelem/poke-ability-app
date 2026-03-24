@@ -24,18 +24,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
-import ru.fefu.pokeabilityapp.ui.common.UiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +40,7 @@ fun AbilityListScreen(
     onAbilityClick: (Int) -> Unit,
     viewModel: AbilityListViewModel = hiltViewModel()
 ) {
-    val favourites by viewModel.favourites.collectAsStateWithLifecycle()
+    val state = viewModel.uiState
 
     Scaffold(
         topBar = {
@@ -51,20 +48,20 @@ fun AbilityListScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (val state = viewModel.uiState) {
-                is UiState.Loading -> {
+            when {
+                state.isLoading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                is UiState.Error -> {
+                state.errorMessage != null -> {
                     ErrorState(
-                        message = state.message,
+                        message = state.errorMessage,
                         onRetry = { viewModel.loadAbilities() }
                     )
                 }
-                is UiState.Content -> {
+                else -> {
                     Column {
                         FilterRow(
-                            filter = viewModel.filter,
+                            filter = state.filter,
                             onFilterChange = { viewModel.onFilterChange(it) }
                         )
                         if (viewModel.visibleAbilities.isEmpty()) {
@@ -73,17 +70,16 @@ fun AbilityListScreen(
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
-                                    text = if (viewModel.filter == AbilityFilter.FAVOURITES)
+                                    text = if (state.filter == AbilityFilter.FAVOURITES)
                                         "No favourites yet\nSwipe to add favourite"
-                                    else
-                                        "Nothing found",
+                                    else "Nothing found",
                                     textAlign = TextAlign.Center
                                 )
                             }
                         } else {
                             AbilityList(
                                 abilities = viewModel.visibleAbilities,
-                                favourites = favourites,
+                                favourites = state.favourites,
                                 onAbilityClick = onAbilityClick,
                                 onToggleFavourite = { viewModel.toggleFavourite(it) }
                             )

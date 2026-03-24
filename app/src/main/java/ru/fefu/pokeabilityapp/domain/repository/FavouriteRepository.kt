@@ -1,9 +1,9 @@
 package ru.fefu.pokeabilityapp.domain.repository
 
-import kotlinx.coroutines.flow.Flow
+import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 
 interface FavouriteRepository {
-    fun getAll(): Flow<Set<Int>>
-    suspend fun add(id: Int)
+    suspend fun getAll(): List<AbilityItem>
+    suspend fun add(item: AbilityItem)
     suspend fun remove(id: Int)
 }

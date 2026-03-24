@@ -8,13 +8,13 @@ import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FavouriteDao{
-    @Query("SELECT * FROM favourites")
-    fun getAll(): Flow<List<FavouriteEntity>>
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+interface FavouriteDao {
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(entity: FavouriteEntity)
 
-    @Delete
-    suspend fun delete(entity: FavouriteEntity)
+    @Query("DELETE FROM favourites WHERE id = :id")
+    suspend fun deleteById(id: Int)
+
+    @Query("SELECT * FROM favourites ORDER BY addedAt DESC")
+    suspend fun getAll(): List<FavouriteEntity>
 }
