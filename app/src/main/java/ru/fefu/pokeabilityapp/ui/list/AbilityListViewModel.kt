@@ -58,7 +58,7 @@ class AbilityListViewModel @Inject constructor(
                 favouriteItems = favs
                 uiState = uiState.copy(favourites = favs.map { it.id }.toSet())
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = "Не удалось загрузить избранное")
+                uiState = uiState.copy(errorMessage = e.message ?: "Не удалось загрузить избранное")
             }
         }
     }

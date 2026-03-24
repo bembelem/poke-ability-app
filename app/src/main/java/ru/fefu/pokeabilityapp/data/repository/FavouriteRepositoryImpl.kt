@@ -1,7 +1,5 @@
 package ru.fefu.pokeabilityapp.data.repository
 
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import ru.fefu.pokeabilityapp.data.local.FavouriteDao
 import ru.fefu.pokeabilityapp.data.local.FavouriteEntity
 import ru.fefu.pokeabilityapp.data.local.toDomain
