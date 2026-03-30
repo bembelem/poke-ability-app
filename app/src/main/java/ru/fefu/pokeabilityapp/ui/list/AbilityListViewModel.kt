@@ -22,13 +22,10 @@ class AbilityListViewModel @Inject constructor(
     var uiState by mutableStateOf(AbilityListUiState())
         private set
 
-    private var items by mutableStateOf(emptyList<AbilityItem>())
-    private var favouriteItems by mutableStateOf(emptyList<AbilityItem>())
-
     val visibleAbilities: List<AbilityItem>
         get() = when (uiState.filter) {
-            AbilityFilter.ALL -> items
-            AbilityFilter.FAVOURITES -> favouriteItems
+            AbilityFilter.ALL -> uiState.items
+            AbilityFilter.FAVOURITES -> uiState.items.filter { it.id in uiState.favourites }
         }
 
     init {
@@ -39,11 +36,10 @@ class AbilityListViewModel @Inject constructor(
     fun loadAbilities() {
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
-            try {
-                items = repository.getAbilities()
-                uiState = uiState.copy(isLoading = false)
+            uiState = try {
+                uiState.copy(isLoading = false, items = repository.getAbilities())
             } catch (e: Exception) {
-                uiState = uiState.copy(
+                uiState.copy(
                     isLoading = false,
                     errorMessage = e.message ?: "Unknown error"
                 )
@@ -55,7 +51,6 @@ class AbilityListViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val favs = favouriteRepository.getAll()
-                favouriteItems = favs
                 uiState = uiState.copy(favourites = favs.map { it.id }.toSet())
             } catch (e: Exception) {
                 uiState = uiState.copy(errorMessage = e.message ?: "Не удалось загрузить избранное")
@@ -70,19 +65,16 @@ class AbilityListViewModel @Inject constructor(
     fun toggleFavourite(id: Int) {
         viewModelScope.launch {
             val currentIds = uiState.favourites
-            val currentItems = favouriteItems
             if (id in currentIds) {
                 favouriteRepository.remove(id)
-                favouriteItems = currentItems.filterNot { it.id == id }
                 uiState = uiState.copy(favourites = currentIds - id)
             } else {
-                val item = items.firstOrNull { it.id == id }
+                val item = uiState.items.firstOrNull { it.id == id }
                 if (item == null) {
                     uiState = uiState.copy(errorMessage = "Не удалось добавить в избранное")
                     return@launch
                 }
                 favouriteRepository.add(item)
-                favouriteItems = listOf(item) + currentItems
                 uiState = uiState.copy(favourites = currentIds + id)
             }
         }
