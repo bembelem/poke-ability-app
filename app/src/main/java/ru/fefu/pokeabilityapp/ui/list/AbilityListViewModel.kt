@@ -11,7 +11,9 @@ import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
+import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.CancellationException
 
 @HiltViewModel
 class AbilityListViewModel @Inject constructor(
@@ -38,11 +40,12 @@ class AbilityListViewModel @Inject constructor(
             uiState = uiState.copy(isLoading = true, errorMessage = null)
             uiState = try {
                 uiState.copy(isLoading = false, items = repository.getAbilities())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState.copy(isLoading = false, errorMessage = "Network error")
             } catch (e: Exception) {
-                uiState.copy(
-                    isLoading = false,
-                    errorMessage = e.message ?: "Unknown error"
-                )
+                uiState.copy(isLoading = false, errorMessage = "Unknown error")
             }
         }
     }
@@ -52,8 +55,12 @@ class AbilityListViewModel @Inject constructor(
             try {
                 val favs = favouriteRepository.getAll()
                 uiState = uiState.copy(favourites = favs.map { it.id }.toSet())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState = uiState.copy(errorMessage = "Network error")
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = e.message ?: "Не удалось загрузить избранное")
+                uiState = uiState.copy(errorMessage = "Database error")
             }
         }
     }
@@ -71,7 +78,7 @@ class AbilityListViewModel @Inject constructor(
             } else {
                 val item = uiState.items.firstOrNull { it.id == id }
                 if (item == null) {
-                    uiState = uiState.copy(errorMessage = "Не удалось добавить в избранное")
+                    uiState = uiState.copy(errorMessage = "Failed to load favourites")
                     return@launch
                 }
                 favouriteRepository.add(item)
