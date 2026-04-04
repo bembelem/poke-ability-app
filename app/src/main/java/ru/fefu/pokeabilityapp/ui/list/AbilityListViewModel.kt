@@ -10,48 +10,73 @@ import kotlinx.coroutines.launch
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
-import ru.fefu.pokeabilityapp.ui.common.UiState
+import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class AbilityListViewModel @Inject constructor(
-    private val repository: AbilityRepository
+    private val repository: AbilityRepository,
+    private val favouriteRepository: FavouriteRepository
 ) : ViewModel() {
 
-    var uiState by mutableStateOf<UiState<List<AbilityItem>>>(UiState.Loading)
-        private set
-
-    private var items by mutableStateOf(emptyList<AbilityItem>())
-
-    var favourites by mutableStateOf(emptySet<Int>())
-        private set
-
-    var filter by mutableStateOf(AbilityFilter.ALL)
+    var uiState by mutableStateOf(AbilityListUiState())
         private set
 
     val visibleAbilities: List<AbilityItem>
-        get() = when (filter) {
-            AbilityFilter.ALL -> items
-            AbilityFilter.FAVOURITES -> items.filter { it.id in favourites }
+        get() = when (uiState.filter) {
+            AbilityFilter.ALL -> uiState.items
+            AbilityFilter.FAVOURITES -> uiState.items.filter { it.id in uiState.favourites }
         }
 
-    init { loadAbilities() }
+    init {
+        loadAbilities()
+        loadFavourites()
+    }
 
     fun loadAbilities() {
         viewModelScope.launch {
-            uiState = UiState.Loading
-            try {
-                items = repository.getAbilities()
-                uiState = UiState.Content(items)
+            uiState = uiState.copy(isLoading = true, errorMessage = null)
+            uiState = try {
+                uiState.copy(isLoading = false, items = repository.getAbilities())
             } catch (e: Exception) {
-                uiState = UiState.Error(e.message ?: "Unknown error")
+                uiState.copy(
+                    isLoading = false,
+                    errorMessage = e.message ?: "Unknown error"
+                )
             }
         }
     }
 
-    fun onFilterChange(f: AbilityFilter) { filter = f }
+    private fun loadFavourites() {
+        viewModelScope.launch {
+            try {
+                val favs = favouriteRepository.getAll()
+                uiState = uiState.copy(favourites = favs.map { it.id }.toSet())
+            } catch (e: Exception) {
+                uiState = uiState.copy(errorMessage = e.message ?: "Не удалось загрузить избранное")
+            }
+        }
+    }
+
+    fun onFilterChange(f: AbilityFilter) {
+        uiState = uiState.copy(filter = f)
+    }
 
     fun toggleFavourite(id: Int) {
-        favourites = if (id in favourites) favourites - id else favourites + id
+        viewModelScope.launch {
+            val currentIds = uiState.favourites
+            if (id in currentIds) {
+                favouriteRepository.remove(id)
+                uiState = uiState.copy(favourites = currentIds - id)
+            } else {
+                val item = uiState.items.firstOrNull { it.id == id }
+                if (item == null) {
+                    uiState = uiState.copy(errorMessage = "Не удалось добавить в избранное")
+                    return@launch
+                }
+                favouriteRepository.add(item)
+                uiState = uiState.copy(favourites = currentIds + id)
+            }
+        }
     }
 }
