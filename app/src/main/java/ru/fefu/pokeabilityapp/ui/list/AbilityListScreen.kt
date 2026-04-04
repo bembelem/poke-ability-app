@@ -24,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -81,7 +82,10 @@ fun AbilityListScreen(
                                 abilities = viewModel.visibleAbilities,
                                 favourites = state.favourites,
                                 onAbilityClick = onAbilityClick,
-                                onToggleFavourite = { viewModel.toggleFavourite(it) }
+                                onToggleFavourite = { viewModel.toggleFavourite(it) },
+                                onLoadMore = { viewModel.loadMore() },
+                                isLoadingMore = state.isLoadingMore,
+                                canLoadMore = state.canLoadMore && state.filter == AbilityFilter.ALL
                             )
                         }
                     }
@@ -96,7 +100,10 @@ fun AbilityList(
     abilities: List<AbilityItem>,
     favourites: Set<Int>,
     onAbilityClick: (Int) -> Unit,
-    onToggleFavourite: (Int) -> Unit
+    onToggleFavourite: (Int) -> Unit,
+    onLoadMore: () -> Unit,
+    isLoadingMore: Boolean,
+    canLoadMore: Boolean
 ) {
     LazyColumn {
         items(items = abilities, key = { it.id }) { ability ->
@@ -107,6 +114,20 @@ fun AbilityList(
                 onToggleFavourite = { onToggleFavourite(ability.id) }
             )
             HorizontalDivider()
+        }
+        if (canLoadMore) {
+            item {
+                if (isLoadingMore) {
+                    Box(
+                        modifier = Modifier.fillMaxWidth().padding(16.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    LaunchedEffect(Unit) { onLoadMore() }
+                }
+            }
         }
     }
 }

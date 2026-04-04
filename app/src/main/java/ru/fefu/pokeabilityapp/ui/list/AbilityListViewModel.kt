@@ -21,6 +21,8 @@ class AbilityListViewModel @Inject constructor(
     private val favouriteRepository: FavouriteRepository
 ) : ViewModel() {
 
+    private var currentOffset = 0
+
     var uiState by mutableStateOf(AbilityListUiState())
         private set
 
@@ -35,17 +37,47 @@ class AbilityListViewModel @Inject constructor(
         loadFavourites()
     }
 
+
     fun loadAbilities() {
+        currentOffset = 0
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
-            uiState = try {
-                uiState.copy(isLoading = false, items = repository.getAbilities())
+            try {
+                val result = repository.getAbilities(offset = 0)
+                currentOffset = result.size
+                uiState = uiState.copy(
+                    isLoading = false,
+                    items = result,
+                    canLoadMore = result.size >= 20
+                )
             } catch (e: CancellationException) {
                 throw e
             } catch (e: IOException) {
-                uiState.copy(isLoading = false, errorMessage = "Network error")
+                uiState = uiState.copy(isLoading = false, errorMessage = "Network error")
             } catch (e: Exception) {
-                uiState.copy(isLoading = false, errorMessage = "Unknown error")
+                uiState = uiState.copy(isLoading = false, errorMessage = "Unknown error")
+            }
+        }
+    }
+
+    fun loadMore() {
+        if (uiState.isLoadingMore || !uiState.canLoadMore) return
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoadingMore = true)
+            try {
+                val result = repository.getAbilities(offset = currentOffset)
+                currentOffset += result.size
+                uiState = uiState.copy(
+                    isLoadingMore = false,
+                    items = uiState.items + result,
+                    canLoadMore = result.size >= 20
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState = uiState.copy(isLoadingMore = false, errorMessage = "Network error")
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoadingMore = false, errorMessage = "Unknown error")
             }
         }
     }
@@ -71,18 +103,24 @@ class AbilityListViewModel @Inject constructor(
 
     fun toggleFavourite(id: Int) {
         viewModelScope.launch {
-            val currentIds = uiState.favourites
-            if (id in currentIds) {
-                favouriteRepository.remove(id)
-                uiState = uiState.copy(favourites = currentIds - id)
-            } else {
-                val item = uiState.items.firstOrNull { it.id == id }
-                if (item == null) {
-                    uiState = uiState.copy(errorMessage = "Failed to load favourites")
-                    return@launch
+            try {
+                val currentIds = uiState.favourites
+                if (id in currentIds) {
+                    favouriteRepository.remove(id)
+                    uiState = uiState.copy(favourites = currentIds - id)
+                } else {
+                    val item = uiState.items.firstOrNull { it.id == id }
+                    if (item == null) {
+                        uiState = uiState.copy(errorMessage = "Failed to add to favourites")
+                        return@launch
+                    }
+                    favouriteRepository.add(item)
+                    uiState = uiState.copy(favourites = currentIds + id)
                 }
-                favouriteRepository.add(item)
-                uiState = uiState.copy(favourites = currentIds + id)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                uiState = uiState.copy(errorMessage = "Failed to update favourites")
             }
         }
     }
