@@ -30,7 +30,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.ui.common.ErrorState
@@ -38,15 +37,16 @@ import ru.fefu.pokeabilityapp.ui.common.ErrorState
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AbilityListScreen(
+    state: AbilityListUiState,
+    visibleAbilities: List<AbilityItem>,
     onAbilityClick: (Int) -> Unit,
-    viewModel: AbilityListViewModel = hiltViewModel()
+    onFilterChange: (AbilityFilter) -> Unit,
+    onToggleFavourite: (Int) -> Unit,
+    onLoadMore: () -> Unit,
+    onRetry: () -> Unit,
 ) {
-    val state = viewModel.uiState
-
     Scaffold(
-        topBar = {
-            TopAppBar(title = { Text("Poke Abilities") })
-        }
+        topBar = { TopAppBar(title = { Text("Poke Abilities") }) }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             when {
@@ -54,18 +54,15 @@ fun AbilityListScreen(
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 state.errorMessage != null -> {
-                    ErrorState(
-                        message = state.errorMessage,
-                        onRetry = { viewModel.loadAbilities() }
-                    )
+                    ErrorState(message = state.errorMessage, onRetry = onRetry)
                 }
                 else -> {
                     Column {
                         FilterRow(
                             filter = state.filter,
-                            onFilterChange = { viewModel.onFilterChange(it) }
+                            onFilterChange = onFilterChange
                         )
-                        if (viewModel.visibleAbilities.isEmpty()) {
+                        if (visibleAbilities.isEmpty()) {
                             Box(
                                 modifier = Modifier.fillMaxSize(),
                                 contentAlignment = Alignment.Center
@@ -79,11 +76,11 @@ fun AbilityListScreen(
                             }
                         } else {
                             AbilityList(
-                                abilities = viewModel.visibleAbilities,
+                                abilities = visibleAbilities,
                                 favourites = state.favourites,
                                 onAbilityClick = onAbilityClick,
-                                onToggleFavourite = { viewModel.toggleFavourite(it) },
-                                onLoadMore = { viewModel.loadMore() },
+                                onToggleFavourite = onToggleFavourite,
+                                onLoadMore = onLoadMore,
                                 isLoadingMore = state.isLoadingMore,
                                 canLoadMore = state.canLoadMore && state.filter == AbilityFilter.ALL
                             )
