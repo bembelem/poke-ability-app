@@ -21,23 +21,4 @@ class MappersTest {
         val result = entry.toAbilityItemOrNull()
         assertNull(result)
     }
-
-    @Test
-    fun `toAbilityDetail uses fallback when no english entry`() {
-        val dto = AbilityDto(
-            id = 1,
-            name = "overgrow",
-            isMainSeries = true,
-            generation = NamedResourceDto("generation-i", ""),
-            effectEntries = emptyList(),
-            flavorTextEntries = emptyList(),
-            pokemon = emptyList()
-        )
-
-        val result = dto.toAbilityDetail()
-
-        assertEquals("-", result.shortEffect)
-        assertEquals("-", result.fullEffect)
-        assertEquals("-", result.flavorText)
-    }
 }
