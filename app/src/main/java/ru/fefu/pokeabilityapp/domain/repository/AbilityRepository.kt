@@ -7,5 +7,5 @@ interface AbilityRepository {
     suspend fun getAbilities(offset: Int = 0): List<AbilityItem>
     suspend fun getAbilityById(id: Int): AbilityDetail
 
-    suspend fun searchByName(name: String): AbilityItem?
+    suspend fun getAbilityByName(name: String): AbilityItem?
 }

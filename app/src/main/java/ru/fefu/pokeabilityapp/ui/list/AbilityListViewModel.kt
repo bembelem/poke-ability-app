@@ -106,7 +106,7 @@ class AbilityListViewModel @Inject constructor(
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
             try {
-                val result = repository.searchByName(query)
+                val result = repository.getAbilityByName(query)
                 if (result == null) {
                     uiState = uiState.copy(isLoading = false, errorMessage = "Ability not found")
                 } else {
