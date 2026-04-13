@@ -45,6 +45,8 @@ class AbilityListScreenTest {
                 onToggleFavourite = {},
                 onLoadMore = {},
                 onRetry = {},
+                onSearch = {},
+                onClearSearch = {},
             )
         }
 

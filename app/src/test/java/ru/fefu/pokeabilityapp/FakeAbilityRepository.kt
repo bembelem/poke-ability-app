@@ -7,8 +7,10 @@ import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 class FakeAbilityRepository : AbilityRepository {
     var abilities: List<AbilityItem> = emptyList()
     var detail: AbilityDetail? = null
+    var searchResult: AbilityItem? = null
     var failGetAbilities = false
     var failGetDetail = false
+    var failSearch = false
 
     override suspend fun getAbilities(offset: Int): List<AbilityItem> {
         if (failGetAbilities) error("getAbilities failed")
@@ -18,5 +20,10 @@ class FakeAbilityRepository : AbilityRepository {
     override suspend fun getAbilityById(id: Int): AbilityDetail {
         if (failGetDetail) error("getAbilityById failed")
         return detail ?: error("no detail set")
+    }
+
+    override suspend fun getAbilityByName(name: String): AbilityItem? {
+        if (failSearch) error("searchByName failed")
+        return searchResult
     }
 }

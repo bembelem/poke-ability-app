@@ -161,4 +161,67 @@ class AbilityListViewModelTest {
 
         assertEquals(21, viewModel.uiState.items.size)
     }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `searchAndNavigate found navigates to detail`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            searchResult = overgrow
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        var navigatedId: Int? = null
+        viewModel.searchAndNavigate("overgrow") { id -> navigatedId = id }
+        advanceUntilIdle()
+
+        assertEquals(overgrow.id, navigatedId)
+        assertFalse(viewModel.uiState.isLoading)
+        assertNull(viewModel.uiState.errorMessage)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `searchAndNavigate not found shows error`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            searchResult = null
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        viewModel.searchAndNavigate("unknown") {}
+        advanceUntilIdle()
+
+        assertEquals("Ability not found", viewModel.uiState.errorMessage)
+        assertFalse(viewModel.uiState.isLoading)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `searchAndNavigate network error shows error`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            failSearch = true
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        viewModel.searchAndNavigate("overgrow") {}
+        advanceUntilIdle()
+
+        assertEquals("Network error", viewModel.uiState.errorMessage)
+        assertFalse(viewModel.uiState.isLoading)
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    @Test
+    fun `searchAndNavigate blank query does nothing`() = runTest {
+        val viewModel = createViewModel()
+        advanceUntilIdle()
+
+        viewModel.searchAndNavigate("   ") {}
+        advanceUntilIdle()
+
+        assertNull(viewModel.uiState.errorMessage)
+        assertFalse(viewModel.uiState.isLoading)
+    }
 }
