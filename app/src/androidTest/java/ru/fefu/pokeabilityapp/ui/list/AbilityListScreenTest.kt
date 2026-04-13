@@ -3,6 +3,8 @@ package ru.fefu.pokeabilityapp.ui.list
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performClick
+import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
@@ -52,5 +54,26 @@ class AbilityListScreenTest {
 
         composeRule.onNodeWithText("No favourites yet\nSwipe to add favourite")
             .assertIsDisplayed()
+    }
+
+    @Test
+    fun abilityItem_click_callsOnAbilityClick() {
+        var clickedId: Int? = null
+
+        composeRule.setContent {
+            AbilityList(
+                abilities = listOf(overgrow, blaze),
+                favourites = emptySet(),
+                onAbilityClick = { clickedId = it },
+                onToggleFavourite = {},
+                onLoadMore = {},
+                isLoadingMore = false,
+                canLoadMore = false
+            )
+        }
+
+        composeRule.onNodeWithText("Overgrow").performClick()
+
+        assertEquals(overgrow.id, clickedId)
     }
 }
