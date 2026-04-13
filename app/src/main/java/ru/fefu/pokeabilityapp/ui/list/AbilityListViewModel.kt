@@ -101,6 +101,31 @@ class AbilityListViewModel @Inject constructor(
         uiState = uiState.copy(filter = f)
     }
 
+    fun searchAndNavigate(query: String, onNavigate: (Int) -> Unit) {
+        if (query.isBlank()) return
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoading = true, errorMessage = null)
+            try {
+                val result = repository.searchByName(query)
+                if (result == null) {
+                    uiState = uiState.copy(isLoading = false, errorMessage = "Ability not found")
+                } else {
+                    uiState = uiState.copy(isLoading = false)
+                    onNavigate(result.id)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoading = false, errorMessage = "Network error")
+            }
+        }
+    }
+
+    fun clearSearch() {
+        uiState = uiState.copy(searchQuery = "")
+        loadAbilities()
+    }
+
     fun toggleFavourite(id: Int) {
         viewModelScope.launch {
             try {
@@ -120,6 +145,7 @@ class AbilityListViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
+                android.util.Log.e("FAV", "toggleFavourite error", e)
                 uiState = uiState.copy(errorMessage = "Failed to update favourites")
             }
         }

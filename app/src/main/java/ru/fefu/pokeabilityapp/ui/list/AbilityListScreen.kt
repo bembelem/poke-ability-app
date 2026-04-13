@@ -4,19 +4,26 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -25,6 +32,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -44,6 +55,8 @@ fun AbilityListScreen(
     onToggleFavourite: (Int) -> Unit,
     onLoadMore: () -> Unit,
     onRetry: () -> Unit,
+    onSearch: (String) -> Unit,
+    onClearSearch: () -> Unit,
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Poke Abilities") }) }
@@ -58,6 +71,11 @@ fun AbilityListScreen(
                 }
                 else -> {
                     Column {
+                        SearchBar(
+                            query = state.searchQuery,
+                            onSearch = onSearch,
+                            onClear = onClearSearch,
+                        )
                         FilterRow(
                             filter = state.filter,
                             onFilterChange = onFilterChange
@@ -125,6 +143,45 @@ fun AbilityList(
                     LaunchedEffect(Unit) { onLoadMore() }
                 }
             }
+        }
+    }
+}
+
+
+@Composable
+fun SearchBar(
+    query: String,
+    onSearch: (String) -> Unit,
+    onClear: () -> Unit,
+) {
+    var text by remember { mutableStateOf(query) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        OutlinedTextField(
+            value = text,
+            onValueChange = { text = it },
+            modifier = Modifier.weight(1f),
+            placeholder = { Text("Search ability...") },
+            singleLine = true,
+            trailingIcon = {
+                if (text.isNotEmpty()) {
+                    IconButton(onClick = {
+                        text = ""
+                        onClear()
+                    }) {
+                        Icon(Icons.Default.Close, contentDescription = "Clear")
+                    }
+                }
+            }
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Button(onClick = { onSearch(text) }) {
+            Text("Search")
         }
     }
 }

@@ -11,4 +11,5 @@ data class AbilityListUiState(
     val canLoadMore: Boolean = true,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
+    val searchQuery: String = "",
 )

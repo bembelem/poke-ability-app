@@ -22,7 +22,7 @@ sealed class Screen(val route: String) {
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.List.route
+        startDestination = Screen.List.route,
     ) {
         composable(Screen.List.route) {
             val viewModel: AbilityListViewModel = hiltViewModel()
@@ -34,6 +34,12 @@ fun NavGraph(navController: NavHostController) {
                 onToggleFavourite = { viewModel.toggleFavourite(it) },
                 onLoadMore = { viewModel.loadMore() },
                 onRetry = { viewModel.loadAbilities() },
+                onSearch = { query ->
+                    viewModel.searchAndNavigate(query) { id ->
+                        navController.navigate(Screen.Detail.createRoute(id))
+                    }
+                },
+                onClearSearch = { viewModel.clearSearch() },
             )
         }
         composable(

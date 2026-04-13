@@ -21,4 +21,13 @@ class AbilityRepositoryImpl @Inject constructor(
     override suspend fun getAbilityById(id: Int): AbilityDetail = withContext(Dispatchers.IO) {
         api.getAbilityById(id).toAbilityDetail()
     }
+
+    override suspend fun searchByName(name: String): AbilityItem? = withContext(Dispatchers.IO) {
+        try {
+            val dto = api.getAbilityByName(name.trim().lowercase())
+            AbilityItem(id = dto.id, name = dto.name)
+        } catch (e: Exception) {
+            null
+        }
+    }
 }
