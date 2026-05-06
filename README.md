@@ -9,12 +9,12 @@
 
 ## Flow (ДЗ 6)
 
-### Источники данных (5 независимых)
+### Источники данных 
 - `queryFlow` — строка поиска (`MutableStateFlow`)
 - `filterFlow` — выбранный фильтр (`MutableStateFlow`)
 - `favouritesFlow` — избранное из Room (`Flow` из DAO)
 - `refreshRequests` — ручной refresh (`MutableSharedFlow`)
-- `_allAbilities` — начальный список способностей из API
+- `_pagingState` — список способностей с пагинацией (`MutableStateFlow`)
 
 ### Реактивная логика
 1) Поиск по мере ввода:
