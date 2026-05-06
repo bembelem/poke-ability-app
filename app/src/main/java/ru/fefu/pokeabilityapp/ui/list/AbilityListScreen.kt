@@ -49,13 +49,12 @@ import ru.fefu.pokeabilityapp.ui.common.ErrorState
 @Composable
 fun AbilityListScreen(
     state: AbilityListUiState,
-    visibleAbilities: List<AbilityItem>,
     onAbilityClick: (Int) -> Unit,
     onFilterChange: (AbilityFilter) -> Unit,
     onToggleFavourite: (Int) -> Unit,
     onLoadMore: () -> Unit,
     onRetry: () -> Unit,
-    onSearch: (String) -> Unit,
+    onQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
 ) {
     Scaffold(
@@ -63,45 +62,59 @@ fun AbilityListScreen(
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             when {
-                state.isLoading -> {
+                state.isLoading && state.items.isEmpty() && state.searchQuery.isBlank() -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                state.errorMessage != null -> {
+                state.errorMessage != null && state.searchQuery.isBlank() -> {
                     ErrorState(message = state.errorMessage, onRetry = onRetry)
                 }
                 else -> {
                     Column {
                         SearchBar(
                             query = state.searchQuery,
-                            onSearch = onSearch,
+                            onQueryChange = onQueryChange,
                             onClear = onClearSearch,
                         )
                         FilterRow(
                             filter = state.filter,
                             onFilterChange = onFilterChange
                         )
-                        if (visibleAbilities.isEmpty()) {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = if (state.filter == AbilityFilter.FAVOURITES)
-                                        "No favourites yet\nSwipe to add favourite"
-                                    else "Nothing found",
-                                    textAlign = TextAlign.Center
+                        when {
+                            state.isLoading && state.searchQuery.isNotBlank() -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            }
+                            state.items.isEmpty() -> {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = when {
+                                            state.filter == AbilityFilter.FAVOURITES ->
+                                                "No favourites yet\nSwipe to add favourite"
+                                            state.hasSearched -> "Nothing found"
+                                            else -> "Nothing found"
+                                        },
+                                        textAlign = TextAlign.Center
+                                    )
+                                }
+                            }
+                            else -> {
+                                AbilityList(
+                                    abilities = state.items,
+                                    favourites = state.favourites,
+                                    onAbilityClick = onAbilityClick,
+                                    onToggleFavourite = onToggleFavourite,
+                                    onLoadMore = onLoadMore,
+                                    isLoadingMore = state.isLoadingMore,
+                                    canLoadMore = state.canLoadMore && state.filter == AbilityFilter.ALL
                                 )
                             }
-                        } else {
-                            AbilityList(
-                                abilities = visibleAbilities,
-                                favourites = state.favourites,
-                                onAbilityClick = onAbilityClick,
-                                onToggleFavourite = onToggleFavourite,
-                                onLoadMore = onLoadMore,
-                                isLoadingMore = state.isLoadingMore,
-                                canLoadMore = state.canLoadMore && state.filter == AbilityFilter.ALL
-                            )
                         }
                     }
                 }
@@ -151,39 +164,23 @@ fun AbilityList(
 @Composable
 fun SearchBar(
     query: String,
-    onSearch: (String) -> Unit,
+    onQueryChange: (String) -> Unit,
     onClear: () -> Unit,
 ) {
-    var text by remember { mutableStateOf(query) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(8.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        OutlinedTextField(
-            value = text,
-            onValueChange = { text = it },
-            modifier = Modifier.weight(1f),
-            placeholder = { Text("Search ability...") },
-            singleLine = true,
-            trailingIcon = {
-                if (text.isNotEmpty()) {
-                    IconButton(onClick = {
-                        text = ""
-                        onClear()
-                    }) {
-                        Icon(Icons.Default.Close, contentDescription = "Clear")
-                    }
+    OutlinedTextField(
+        value = query,
+        onValueChange = onQueryChange,
+        modifier = Modifier.fillMaxWidth().padding(8.dp),
+        placeholder = { Text("Search ability...") },
+        singleLine = true,
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = onClear) {
+                    Icon(Icons.Default.Close, contentDescription = "Clear")
                 }
             }
-        )
-        Spacer(modifier = Modifier.width(8.dp))
-        Button(onClick = { onSearch(text) }) {
-            Text("Search")
         }
-    }
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)

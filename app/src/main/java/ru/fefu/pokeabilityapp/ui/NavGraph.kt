@@ -1,7 +1,9 @@
 package ru.fefu.pokeabilityapp.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -26,19 +28,15 @@ fun NavGraph(navController: NavHostController) {
     ) {
         composable(Screen.List.route) {
             val viewModel: AbilityListViewModel = hiltViewModel()
+            val state by viewModel.uiState.collectAsStateWithLifecycle()
             AbilityListScreen(
-                state = viewModel.uiState,
-                visibleAbilities = viewModel.visibleAbilities,
+                state = state,
                 onAbilityClick = { id -> navController.navigate(Screen.Detail.createRoute(id)) },
                 onFilterChange = { viewModel.onFilterChange(it) },
                 onToggleFavourite = { viewModel.toggleFavourite(it) },
-                onLoadMore = { viewModel.loadMore() },
-                onRetry = { viewModel.loadAbilities() },
-                onSearch = { query ->
-                    viewModel.searchAndNavigate(query) { id ->
-                        navController.navigate(Screen.Detail.createRoute(id))
-                    }
-                },
+                onLoadMore = { },
+                onRetry = { viewModel.refresh() },
+                onQueryChange = { viewModel.onSearchQueryChange(it) },
                 onClearSearch = { viewModel.clearSearch() },
             )
         }
