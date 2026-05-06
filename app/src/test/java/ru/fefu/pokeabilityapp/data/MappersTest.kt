@@ -3,7 +3,7 @@ package ru.fefu.pokeabilityapp.data
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test
-import ru.fefu.pokeabilityapp.data.dto.*
+import ru.fefu.pokeabilityapp.data.dto.AbilityEntryDto
 
 class MappersTest {
 
