@@ -36,7 +36,7 @@ fun NavGraph(navController: NavHostController) {
                 onToggleFavourite = { viewModel.toggleFavourite(it) },
                 onLoadMore = { viewModel.loadMore() },
                 onRetry = { viewModel.refresh() },
-                onQueryChange = { viewModel.onSearchQueryCghange(it) },
+                onQueryChange = { viewModel.onSearchQueryChange(it) },
                 onClearSearch = { viewModel.clearSearch() },
             )
         }
