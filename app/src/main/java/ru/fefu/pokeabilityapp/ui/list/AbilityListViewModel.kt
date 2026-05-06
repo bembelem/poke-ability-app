@@ -53,16 +53,52 @@ class AbilityListViewModel @Inject constructor(
     private val filterFlow = MutableStateFlow(AbilityFilter.ALL)
     private val refreshRequests = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-    private val _allAbilities: StateFlow<List<AbilityItem>> =
-        flow {
-            emit(repository.getAbilities(offset = 0))
+    private data class PagingState(
+        val items: List<AbilityItem> = emptyList(),
+        val isLoading: Boolean = true,
+        val isLoadingMore: Boolean = false,
+        val canLoadMore: Boolean = true,
+        val error: String? = null,
+    )
+
+    private val _pagingState = MutableStateFlow(PagingState())
+
+    init {
+        viewModelScope.launch {
+            try {
+                val result = repository.getAbilities(offset = 0)
+                _pagingState.value = PagingState(
+                    items = result,
+                    isLoading = false,
+                    canLoadMore = result.size >= 20
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _pagingState.value = PagingState(isLoading = false, error = "Network error")
+            }
         }
-            .catch { emit(emptyList()) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = emptyList()
-            )
+    }
+
+    fun loadMore() {
+        val paging = _pagingState.value
+        if (paging.isLoadingMore || !paging.canLoadMore) return
+        viewModelScope.launch {
+            _pagingState.value = paging.copy(isLoadingMore = true)
+            try {
+                val result = repository.getAbilities(offset = paging.items.size)
+                _pagingState.value = paging.copy(
+                    items = paging.items + result,
+                    isLoadingMore = false,
+                    canLoadMore = result.size >= 20
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                _pagingState.value = paging.copy(isLoadingMore = false)
+            }
+        }
+    }
 
     private val favouritesFlow: StateFlow<Set<Int>> =
         favouriteRepository.observeAll()
@@ -133,27 +169,24 @@ class AbilityListViewModel @Inject constructor(
             filterFlow,
             favouritesFlow,
             searchState,
-            _allAbilities,
-        ) { rawQuery, filter, favourites, search, allAbilities ->
+            _pagingState,
+        ) { rawQuery, filter, favourites, search, paging ->
             val effectiveQuery = rawQuery.trim()
-
-            val baseItems = if (effectiveQuery.isBlank()) allAbilities else search.items
-
+            val baseItems = if (effectiveQuery.isBlank()) paging.items else search.items
             val visibleItems = when (filter) {
                 AbilityFilter.ALL -> baseItems
                 AbilityFilter.FAVOURITES -> baseItems.filter { it.id in favourites }
             }
-
             AbilityListUiState(
                 items = visibleItems,
                 favourites = favourites,
                 filter = filter,
                 searchQuery = rawQuery,
-                isLoading = search.isLoading,
-                errorMessage = search.errorMessage,
+                isLoading = if (effectiveQuery.isBlank()) paging.isLoading else search.isLoading,
+                errorMessage = if (effectiveQuery.isBlank()) paging.error else search.errorMessage,
                 hasSearched = search.hasSearched,
-                canLoadMore = false,
-                isLoadingMore = false,
+                canLoadMore = effectiveQuery.isBlank() && paging.canLoadMore,
+                isLoadingMore = paging.isLoadingMore,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -184,7 +217,7 @@ class AbilityListViewModel @Inject constructor(
                 if (id in currentIds) {
                     favouriteRepository.remove(id)
                 } else {
-                    val item = _allAbilities.value.firstOrNull { it.id == id }
+                    val item = _pagingState.value.items.firstOrNull { it.id == id }
                         ?: searchState.value.items.firstOrNull { it.id == id }
                         ?: return@launch
                     favouriteRepository.add(item)

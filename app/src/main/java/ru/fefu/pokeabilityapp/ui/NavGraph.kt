@@ -34,9 +34,9 @@ fun NavGraph(navController: NavHostController) {
                 onAbilityClick = { id -> navController.navigate(Screen.Detail.createRoute(id)) },
                 onFilterChange = { viewModel.onFilterChange(it) },
                 onToggleFavourite = { viewModel.toggleFavourite(it) },
-                onLoadMore = { },
+                onLoadMore = { viewModel.loadMore() },
                 onRetry = { viewModel.refresh() },
-                onQueryChange = { viewModel.onSearchQueryChange(it) },
+                onQueryChange = { viewModel.onSearchQueryCghange(it) },
                 onClearSearch = { viewModel.clearSearch() },
             )
         }
