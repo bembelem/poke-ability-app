@@ -6,11 +6,13 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.launch
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
+import java.io.IOException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -18,6 +20,8 @@ class AbilityListViewModel @Inject constructor(
     private val repository: AbilityRepository,
     private val favouriteRepository: FavouriteRepository
 ) : ViewModel() {
+
+    private var currentOffset = 0
 
     var uiState by mutableStateOf(AbilityListUiState())
         private set
@@ -33,16 +37,47 @@ class AbilityListViewModel @Inject constructor(
         loadFavourites()
     }
 
+
     fun loadAbilities() {
+        currentOffset = 0
         viewModelScope.launch {
             uiState = uiState.copy(isLoading = true, errorMessage = null)
-            uiState = try {
-                uiState.copy(isLoading = false, items = repository.getAbilities())
-            } catch (e: Exception) {
-                uiState.copy(
+            try {
+                val result = repository.getAbilities(offset = 0)
+                currentOffset = result.size
+                uiState = uiState.copy(
                     isLoading = false,
-                    errorMessage = e.message ?: "Unknown error"
+                    items = result,
+                    canLoadMore = result.size >= 20
                 )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState = uiState.copy(isLoading = false, errorMessage = "Network error")
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoading = false, errorMessage = "Unknown error")
+            }
+        }
+    }
+
+    fun loadMore() {
+        if (uiState.isLoadingMore || !uiState.canLoadMore) return
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoadingMore = true)
+            try {
+                val result = repository.getAbilities(offset = currentOffset)
+                currentOffset += result.size
+                uiState = uiState.copy(
+                    isLoadingMore = false,
+                    items = uiState.items + result,
+                    canLoadMore = result.size >= 20
+                )
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState = uiState.copy(isLoadingMore = false, errorMessage = "Network error")
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoadingMore = false, errorMessage = "Unknown error")
             }
         }
     }
@@ -52,8 +87,12 @@ class AbilityListViewModel @Inject constructor(
             try {
                 val favs = favouriteRepository.getAll()
                 uiState = uiState.copy(favourites = favs.map { it.id }.toSet())
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: IOException) {
+                uiState = uiState.copy(errorMessage = "Network error")
             } catch (e: Exception) {
-                uiState = uiState.copy(errorMessage = e.message ?: "Не удалось загрузить избранное")
+                uiState = uiState.copy(errorMessage = "Database error")
             }
         }
     }
@@ -62,20 +101,52 @@ class AbilityListViewModel @Inject constructor(
         uiState = uiState.copy(filter = f)
     }
 
+    fun searchAndNavigate(query: String, onNavigate: (Int) -> Unit) {
+        if (query.isBlank()) return
+        viewModelScope.launch {
+            uiState = uiState.copy(isLoading = true, errorMessage = null)
+            try {
+                val result = repository.getAbilityByName(query)
+                if (result == null) {
+                    uiState = uiState.copy(isLoading = false, errorMessage = "Ability not found")
+                } else {
+                    uiState = uiState.copy(isLoading = false)
+                    onNavigate(result.id)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                uiState = uiState.copy(isLoading = false, errorMessage = "Network error")
+            }
+        }
+    }
+
+    fun clearSearch() {
+        uiState = uiState.copy(searchQuery = "")
+        loadAbilities()
+    }
+
     fun toggleFavourite(id: Int) {
         viewModelScope.launch {
-            val currentIds = uiState.favourites
-            if (id in currentIds) {
-                favouriteRepository.remove(id)
-                uiState = uiState.copy(favourites = currentIds - id)
-            } else {
-                val item = uiState.items.firstOrNull { it.id == id }
-                if (item == null) {
-                    uiState = uiState.copy(errorMessage = "Не удалось добавить в избранное")
-                    return@launch
+            try {
+                val currentIds = uiState.favourites
+                if (id in currentIds) {
+                    favouriteRepository.remove(id)
+                    uiState = uiState.copy(favourites = currentIds - id)
+                } else {
+                    val item = uiState.items.firstOrNull { it.id == id }
+                    if (item == null) {
+                        uiState = uiState.copy(errorMessage = "Failed to add to favourites")
+                        return@launch
+                    }
+                    favouriteRepository.add(item)
+                    uiState = uiState.copy(favourites = currentIds + id)
                 }
-                favouriteRepository.add(item)
-                uiState = uiState.copy(favourites = currentIds + id)
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                android.util.Log.e("FAV", "toggleFavourite error", e)
+                uiState = uiState.copy(errorMessage = "Failed to update favourites")
             }
         }
     }

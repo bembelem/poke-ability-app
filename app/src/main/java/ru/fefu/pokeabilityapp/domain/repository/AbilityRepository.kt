@@ -6,4 +6,6 @@ import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 interface AbilityRepository {
     suspend fun getAbilities(offset: Int = 0): List<AbilityItem>
     suspend fun getAbilityById(id: Int): AbilityDetail
+
+    suspend fun getAbilityByName(name: String): AbilityItem?
 }
