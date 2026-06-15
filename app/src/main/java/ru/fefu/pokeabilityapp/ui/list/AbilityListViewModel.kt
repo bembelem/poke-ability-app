@@ -59,6 +59,7 @@ class AbilityListViewModel @Inject constructor(
         val isLoadingMore: Boolean = false,
         val canLoadMore: Boolean = true,
         val error: String? = null,
+        val loadMoreError: String? = null,
     )
 
     private val _pagingState = MutableStateFlow(PagingState())
@@ -89,7 +90,7 @@ class AbilityListViewModel @Inject constructor(
         val paging = _pagingState.value
         if (paging.isLoadingMore || !paging.canLoadMore) return
         viewModelScope.launch {
-            _pagingState.value = paging.copy(isLoadingMore = true)
+            _pagingState.value = paging.copy(isLoadingMore = true, loadMoreError = null)
             try {
                 val result = repository.getAbilities(offset = paging.items.size)
                 _pagingState.value = paging.copy(
@@ -100,7 +101,10 @@ class AbilityListViewModel @Inject constructor(
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
-                _pagingState.value = paging.copy(isLoadingMore = false)
+                _pagingState.value = paging.copy(
+                    isLoadingMore = false,
+                    loadMoreError = "Network error"
+                )
             }
         }
     }
@@ -192,6 +196,7 @@ class AbilityListViewModel @Inject constructor(
                 hasSearched = search.hasSearched,
                 canLoadMore = effectiveQuery.isBlank() && paging.canLoadMore,
                 isLoadingMore = paging.isLoadingMore,
+                loadMoreError = if (effectiveQuery.isBlank()) paging.loadMoreError else null,
             )
         }.stateIn(
             scope = viewModelScope,

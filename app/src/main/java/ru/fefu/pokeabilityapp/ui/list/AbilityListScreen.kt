@@ -24,6 +24,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
@@ -104,6 +105,7 @@ fun AbilityListScreen(
                                     onToggleFavourite = onToggleFavourite,
                                     onLoadMore = onLoadMore,
                                     isLoadingMore = state.isLoadingMore,
+                                    loadMoreError = state.loadMoreError,
                                     canLoadMore = state.canLoadMore && state.filter == AbilityFilter.ALL
                                 )
                             }
@@ -123,6 +125,7 @@ fun AbilityList(
     onToggleFavourite: (Int) -> Unit,
     onLoadMore: () -> Unit,
     isLoadingMore: Boolean,
+    loadMoreError: String?,
     canLoadMore: Boolean
 ) {
     LazyColumn {
@@ -137,15 +140,27 @@ fun AbilityList(
         }
         if (canLoadMore) {
             item {
-                if (isLoadingMore) {
-                    Box(
-                        modifier = Modifier.fillMaxWidth().padding(16.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator()
+                when {
+                    isLoadingMore -> {
+                        Box(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator()
+                        }
                     }
-                } else {
-                    LaunchedEffect(Unit) { onLoadMore() }
+                    loadMoreError != null -> {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(text = loadMoreError, textAlign = TextAlign.Center)
+                            TextButton(onClick = onLoadMore) {
+                                Text("Retry")
+                            }
+                        }
+                    }
+                    else -> LaunchedEffect(Unit) { onLoadMore() }
                 }
             }
         }

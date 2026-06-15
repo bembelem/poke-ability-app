@@ -8,6 +8,7 @@ data class AbilityListUiState(
     val favourites: Set<Int> = emptySet(),
     val filter: AbilityFilter = AbilityFilter.ALL,
     val isLoadingMore: Boolean = false,
+    val loadMoreError: String? = null,
     val canLoadMore: Boolean = true,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,

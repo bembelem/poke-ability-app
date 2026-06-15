@@ -168,6 +168,24 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `loadMore failure sets loadMoreError and keeps items`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            abilities = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        abilityRepo.failGetAbilities = true
+        viewModel.loadMore()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals("Network error", state.loadMoreError)
+        assertEquals(20, state.items.size)
+        assertFalse(state.isLoadingMore)
+    }
+
+    @Test
     fun `searchAndNavigate found navigates to detail`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             searchResult = overgrow

@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
@@ -28,6 +29,7 @@ class AbilityListScreenTest {
                 onToggleFavourite = {},
                 onLoadMore = {},
                 isLoadingMore = false,
+                loadMoreError = null,
                 canLoadMore = false
             )
         }
@@ -67,6 +69,7 @@ class AbilityListScreenTest {
                 onToggleFavourite = {},
                 onLoadMore = {},
                 isLoadingMore = false,
+                loadMoreError = null,
                 canLoadMore = false
             )
         }
@@ -74,5 +77,28 @@ class AbilityListScreenTest {
         composeRule.onNodeWithText("Overgrow").performClick()
 
         assertEquals(overgrow.id, clickedId)
+    }
+
+    @Test
+    fun loadMoreError_showsRetry_andRetryCallsOnLoadMore() {
+        var retried = false
+
+        composeRule.setContent {
+            AbilityList(
+                abilities = listOf(overgrow),
+                favourites = emptySet(),
+                onAbilityClick = {},
+                onToggleFavourite = {},
+                onLoadMore = { retried = true },
+                isLoadingMore = false,
+                loadMoreError = "Network error",
+                canLoadMore = true
+            )
+        }
+
+        composeRule.onNodeWithText("Retry").assertIsDisplayed()
+        composeRule.onNodeWithText("Retry").performClick()
+
+        assertTrue(retried)
     }
 }
