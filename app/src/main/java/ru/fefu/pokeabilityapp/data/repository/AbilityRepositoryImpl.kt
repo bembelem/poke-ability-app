@@ -2,6 +2,7 @@ package ru.fefu.pokeabilityapp.data.repository
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import retrofit2.HttpException
 import ru.fefu.pokeabilityapp.data.service.PokeApiService
 import ru.fefu.pokeabilityapp.data.toAbilityDetail
 import ru.fefu.pokeabilityapp.data.toAbilityItemOrNull
@@ -26,8 +27,8 @@ class AbilityRepositoryImpl @Inject constructor(
         try {
             val dto = api.getAbilityByName(name.trim().lowercase())
             AbilityItem(id = dto.id, name = dto.name)
-        } catch (e: Exception) {
-            null
+        } catch (e: HttpException) {
+            if (e.code() == 404) null else throw e
         }
     }
 }
