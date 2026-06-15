@@ -159,7 +159,7 @@ class AbilityListViewModel @Inject constructor(
                         errorMessage = null,
                         hasSearched = true
                     )
-                    is SearchEvent.Error -> previous.copy(
+                    is SearchEvent.Error -> SearchState(
                         isLoading = false,
                         errorMessage = event.message,
                         hasSearched = true

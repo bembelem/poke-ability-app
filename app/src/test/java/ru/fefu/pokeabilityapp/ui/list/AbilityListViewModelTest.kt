@@ -186,6 +186,28 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `search error clears previous results`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            abilities = listOf(overgrow, blaze)
+            searchResult = overgrow
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        viewModel.onSearchQueryChange("overgrow")
+        advanceUntilIdle()
+        assertEquals(listOf(overgrow), viewModel.uiState.value.items)
+
+        abilityRepo.failSearch = true
+        viewModel.onSearchQueryChange("blaze")
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertNotNull(state.errorMessage)
+        assertTrue(state.items.isEmpty())
+    }
+
+    @Test
     fun `searchAndNavigate found navigates to detail`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             searchResult = overgrow
