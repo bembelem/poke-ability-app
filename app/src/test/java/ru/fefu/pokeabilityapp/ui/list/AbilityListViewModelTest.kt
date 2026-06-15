@@ -133,6 +133,26 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `refresh after error loads first page again`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            failGetAbilities = true
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        assertNotNull(viewModel.uiState.value.errorMessage)
+
+        abilityRepo.failGetAbilities = false
+        abilityRepo.abilities = listOf(overgrow)
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertNull(state.errorMessage)
+        assertEquals(listOf(overgrow), state.items)
+    }
+
+    @Test
     fun `loadMore appends items to existing list`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             abilities = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }

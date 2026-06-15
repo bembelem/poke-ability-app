@@ -64,7 +64,12 @@ class AbilityListViewModel @Inject constructor(
     private val _pagingState = MutableStateFlow(PagingState())
 
     init {
+        loadFirstPage()
+    }
+
+    private fun loadFirstPage() {
         viewModelScope.launch {
+            _pagingState.value = PagingState(isLoading = true)
             try {
                 val result = repository.getAbilities(offset = 0)
                 _pagingState.value = PagingState(
@@ -208,6 +213,7 @@ class AbilityListViewModel @Inject constructor(
 
     fun refresh() {
         refreshRequests.tryEmit(Unit)
+        loadFirstPage()
     }
 
     fun toggleFavourite(id: Int) {
