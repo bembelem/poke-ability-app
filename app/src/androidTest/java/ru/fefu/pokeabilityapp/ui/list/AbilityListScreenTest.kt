@@ -101,4 +101,26 @@ class AbilityListScreenTest {
 
         assertTrue(retried)
     }
+
+    @Test
+    fun searchError_showsErrorState() {
+        composeRule.setContent {
+            AbilityListScreen(
+                state = AbilityListUiState(
+                    searchQuery = "overgrow",
+                    errorMessage = "Network error",
+                    hasSearched = true,
+                ),
+                onAbilityClick = {},
+                onFilterChange = {},
+                onToggleFavourite = {},
+                onLoadMore = {},
+                onRetry = {},
+                onQueryChange = {},
+                onClearSearch = {},
+            )
+        }
+
+        composeRule.onNodeWithText("Ошибка: Network error").assertIsDisplayed()
+    }
 }

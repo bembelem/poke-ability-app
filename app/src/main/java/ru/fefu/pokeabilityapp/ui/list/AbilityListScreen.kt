@@ -81,6 +81,9 @@ fun AbilityListScreen(
                                     CircularProgressIndicator()
                                 }
                             }
+                            state.errorMessage != null -> {
+                                ErrorState(message = state.errorMessage, onRetry = onRetry)
+                            }
                             state.items.isEmpty() -> {
                                 Box(
                                     modifier = Modifier.fillMaxSize(),
