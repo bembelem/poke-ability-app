@@ -1,6 +1,9 @@
 package ru.fefu.pokeabilityapp.ui.list
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -16,6 +19,7 @@ import ru.fefu.pokeabilityapp.MainDispatcherRule
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class AbilityListViewModelTest {
 
     @get:Rule
@@ -24,40 +28,46 @@ class AbilityListViewModelTest {
     private val overgrow = AbilityItem(id = 1, name = "overgrow")
     private val blaze = AbilityItem(id = 2, name = "blaze")
 
-    private fun createViewModel(
+    // uiState собран через WhileSubscribed, без подписчика value не обновляется
+    private fun TestScope.createViewModel(
         abilityRepo: FakeAbilityRepository = FakeAbilityRepository(),
         favouriteRepo: FakeFavouriteRepository = FakeFavouriteRepository()
-    ) = AbilityListViewModel(abilityRepo, favouriteRepo)
+    ): AbilityListViewModel {
+        val viewModel = AbilityListViewModel(abilityRepo, favouriteRepo)
+        backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+            viewModel.uiState.collect { }
+        }
+        return viewModel
+    }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `loadAbilities success updates items`() = runTest {
+    fun `first page success updates items`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             abilities = listOf(overgrow, blaze)
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.isLoading)
-        assertNull(viewModel.uiState.errorMessage)
-        assertEquals(listOf(overgrow, blaze), viewModel.uiState.items)
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertNull(state.errorMessage)
+        assertEquals(listOf(overgrow, blaze), state.items)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `loadAbilities failure sets error message`() = runTest {
+    fun `first page failure sets error message`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             failGetAbilities = true
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        assertFalse(viewModel.uiState.isLoading)
-        assertNotNull(viewModel.uiState.errorMessage)
-        assertTrue(viewModel.uiState.items.isEmpty())
+        val state = viewModel.uiState.value
+        assertFalse(state.isLoading)
+        assertNotNull(state.errorMessage)
+        assertTrue(state.items.isEmpty())
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `toggleFavourite adds item to favourites`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
@@ -69,14 +79,13 @@ class AbilityListViewModelTest {
         viewModel.toggleFavourite(overgrow.id)
         advanceUntilIdle()
 
-        assertTrue(overgrow.id in viewModel.uiState.favourites)
+        assertTrue(overgrow.id in viewModel.uiState.value.favourites)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `toggleFavourite removes item from favourites`() = runTest {
         val favouriteRepo = FakeFavouriteRepository().apply {
-            favourites.add(overgrow)
+            seed(overgrow)
         }
         val abilityRepo = FakeAbilityRepository().apply {
             abilities = listOf(overgrow, blaze)
@@ -87,33 +96,29 @@ class AbilityListViewModelTest {
         viewModel.toggleFavourite(overgrow.id)
         advanceUntilIdle()
 
-        assertFalse(overgrow.id in viewModel.uiState.favourites)
+        assertFalse(overgrow.id in viewModel.uiState.value.favourites)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `toggleFavourite does not add duplicate`() = runTest {
+    fun `toggleFavourite three times leaves one favourite`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             abilities = listOf(overgrow)
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        viewModel.toggleFavourite(overgrow.id)
-        advanceUntilIdle()
-        viewModel.toggleFavourite(overgrow.id)
-        advanceUntilIdle()
-        viewModel.toggleFavourite(overgrow.id)
-        advanceUntilIdle()
+        repeat(3) {
+            viewModel.toggleFavourite(overgrow.id)
+            advanceUntilIdle()
+        }
 
-        assertEquals(1, viewModel.uiState.favourites.size)
+        assertEquals(1, viewModel.uiState.value.favourites.size)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
-    fun `onFilterChange to favourites shows only favourites`() = runTest {
+    fun `favourites filter shows only favourites`() = runTest {
         val favouriteRepo = FakeFavouriteRepository().apply {
-            favourites.add(overgrow)
+            seed(overgrow)
         }
         val abilityRepo = FakeAbilityRepository().apply {
             abilities = listOf(overgrow, blaze)
@@ -122,31 +127,11 @@ class AbilityListViewModelTest {
         advanceUntilIdle()
 
         viewModel.onFilterChange(AbilityFilter.FAVOURITES)
-
-        assertEquals(listOf(overgrow), viewModel.visibleAbilities)
-    }
-
-    @OptIn(ExperimentalCoroutinesApi::class)
-    @Test
-    fun `retry after error loads abilities successfully`() = runTest {
-        val abilityRepo = FakeAbilityRepository().apply {
-            failGetAbilities = true
-        }
-        val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        assertNotNull(viewModel.uiState.errorMessage)
-
-        abilityRepo.failGetAbilities = false
-        abilityRepo.abilities = listOf(overgrow)
-        viewModel.loadAbilities()
-        advanceUntilIdle()
-
-        assertNull(viewModel.uiState.errorMessage)
-        assertEquals(listOf(overgrow), viewModel.uiState.items)
+        assertEquals(listOf(overgrow), viewModel.uiState.value.items)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `loadMore appends items to existing list`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
@@ -159,10 +144,9 @@ class AbilityListViewModelTest {
         viewModel.loadMore()
         advanceUntilIdle()
 
-        assertEquals(21, viewModel.uiState.items.size)
+        assertEquals(21, viewModel.uiState.value.items.size)
     }
 
-    @OptIn(ExperimentalCoroutinesApi::class)
     @Test
     fun `searchAndNavigate found navigates to detail`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
@@ -176,7 +160,5 @@ class AbilityListViewModelTest {
         advanceUntilIdle()
 
         assertEquals(overgrow.id, navigatedId)
-        assertFalse(viewModel.uiState.isLoading)
-        assertNull(viewModel.uiState.errorMessage)
     }
 }

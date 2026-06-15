@@ -4,7 +4,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import junit.framework.TestCase.assertEquals
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
@@ -41,13 +41,12 @@ class AbilityListScreenTest {
         composeRule.setContent {
             AbilityListScreen(
                 state = AbilityListUiState(filter = AbilityFilter.FAVOURITES),
-                visibleAbilities = emptyList(),
                 onAbilityClick = {},
                 onFilterChange = {},
                 onToggleFavourite = {},
                 onLoadMore = {},
                 onRetry = {},
-                onSearch = {},
+                onQueryChange = {},
                 onClearSearch = {},
             )
         }
