@@ -123,4 +123,25 @@ class AbilityListScreenTest {
 
         composeRule.onNodeWithText("Ошибка: Network error").assertIsDisplayed()
     }
+
+    @Test
+    fun emptySearchResult_showsQueryInMessage() {
+        composeRule.setContent {
+            AbilityListScreen(
+                state = AbilityListUiState(
+                    searchQuery = "zzz",
+                    hasSearched = true,
+                ),
+                onAbilityClick = {},
+                onFilterChange = {},
+                onToggleFavourite = {},
+                onLoadMore = {},
+                onRetry = {},
+                onQueryChange = {},
+                onClearSearch = {},
+            )
+        }
+
+        composeRule.onNodeWithText("Nothing found for \"zzz\"").assertIsDisplayed()
+    }
 }

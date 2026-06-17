@@ -93,8 +93,9 @@ fun AbilityListScreen(
                                         text = when {
                                             state.filter == AbilityFilter.FAVOURITES ->
                                                 "No favourites yet\nSwipe to add favourite"
-                                            state.hasSearched -> "Nothing found"
-                                            else -> "Nothing found"
+                                            state.hasSearched ->
+                                                "Nothing found for \"${state.searchQuery.trim()}\""
+                                            else -> "No abilities to show"
                                         },
                                         textAlign = TextAlign.Center
                                     )
