@@ -238,18 +238,4 @@ class AbilityListViewModel @Inject constructor(
             } catch (e: Exception) { }
         }
     }
-
-    fun searchAndNavigate(query: String, onNavigate: (Int) -> Unit) {
-        if (query.isBlank()) return
-        viewModelScope.launch {
-            try {
-                val result = repository.getAbilityByName(query.trim().lowercase())
-                if (result != null) onNavigate(result.id)
-            } catch (e: CancellationException) {
-                throw e
-            } catch (e: Exception) {
-
-            }
-        }
-    }
 }

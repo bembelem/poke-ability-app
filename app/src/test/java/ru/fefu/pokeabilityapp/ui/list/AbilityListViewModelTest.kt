@@ -206,19 +206,4 @@ class AbilityListViewModelTest {
         assertNotNull(state.errorMessage)
         assertTrue(state.items.isEmpty())
     }
-
-    @Test
-    fun `searchAndNavigate found navigates to detail`() = runTest {
-        val abilityRepo = FakeAbilityRepository().apply {
-            searchResult = overgrow
-        }
-        val viewModel = createViewModel(abilityRepo)
-        advanceUntilIdle()
-
-        var navigatedId: Int? = null
-        viewModel.searchAndNavigate("overgrow") { id -> navigatedId = id }
-        advanceUntilIdle()
-
-        assertEquals(overgrow.id, navigatedId)
-    }
 }
