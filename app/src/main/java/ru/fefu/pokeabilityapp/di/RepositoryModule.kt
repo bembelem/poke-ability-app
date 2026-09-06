@@ -6,8 +6,10 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.repository.AbilityRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.FavouriteRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.SettingsRepositoryImpl
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
+import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository
 import javax.inject.Singleton
 
 @Module
@@ -25,4 +27,10 @@ abstract class RepositoryModule {
     abstract fun bindFavouriteRepository(
         impl: FavouriteRepositoryImpl
     ): FavouriteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
 }
