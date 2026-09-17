@@ -1,12 +1,26 @@
 package ru.fefu.pokeabilityapp.data.local
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.ForeignKey
+import androidx.room.Index
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 
-@Entity(tableName = "favourites")
+@Entity(
+    tableName = "favourites",
+    primaryKeys = ["profileId", "id"],
+    foreignKeys = [
+        ForeignKey(
+            entity = ProfileEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["profileId"],
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("profileId")]
+)
 data class FavouriteEntity(
-    @PrimaryKey val id: Int,
+    val profileId: Long,
+    val id: Int,
     val name: String,
     val addedAt: Long = System.currentTimeMillis()
 )

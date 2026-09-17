@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
@@ -16,6 +17,8 @@ class FavouriteDaoTest {
 
     private lateinit var database: AppDatabase
     private lateinit var dao: FavouriteDao
+    private var ash = 0L
+    private var gary = 0L
 
     @Before
     fun createDb() {
@@ -24,6 +27,10 @@ class FavouriteDaoTest {
             .allowMainThreadQueries()
             .build()
         dao = database.getFavouriteDao()
+        runBlocking {
+            ash = database.getProfileDao().insert(ProfileEntity(name = "Ash", createdAt = 1))
+            gary = database.getProfileDao().insert(ProfileEntity(name = "Gary", createdAt = 2))
+        }
     }
 
     @After
@@ -33,37 +40,63 @@ class FavouriteDaoTest {
 
     @Test
     fun insert_andGetAll_returnsItemsOrderedByAddedAtDesc() = runTest {
-        val old = FavouriteEntity(id = 1, name = "overgrow", addedAt = 100)
-        val new = FavouriteEntity(id = 2, name = "blaze", addedAt = 200)
+        val old = FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100)
+        val new = FavouriteEntity(profileId = ash, id = 2, name = "blaze", addedAt = 200)
 
         dao.insert(old)
         dao.insert(new)
-        val result = dao.getAll()
+        val result = dao.getAll(ash)
 
         assertEquals(listOf(new, old), result)
     }
 
     @Test
     fun deleteById_removesItem() = runTest {
-        val item = FavouriteEntity(id = 1, name = "overgrow", addedAt = 100)
-        dao.insert(item)
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100))
 
-        dao.deleteById(1)
-        val result = dao.getAll()
+        dao.deleteById(ash, 1)
+        val result = dao.getAll(ash)
 
         assertEquals(emptyList<FavouriteEntity>(), result)
     }
 
     @Test
     fun insert_duplicate_replacesExisting() = runTest {
-        val item = FavouriteEntity(id = 1, name = "overgrow", addedAt = 100)
-        val updated = FavouriteEntity(id = 1, name = "overgrow", addedAt = 200)
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100))
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 200))
 
-        dao.insert(item)
-        dao.insert(updated)
-        val result = dao.getAll()
+        val result = dao.getAll(ash)
 
         assertEquals(1, result.size)
         assertEquals(200, result[0].addedAt)
+    }
+
+    @Test
+    fun favourites_areSeparatedByProfile() = runTest {
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100))
+        dao.insert(FavouriteEntity(profileId = gary, id = 2, name = "blaze", addedAt = 100))
+
+        assertEquals(listOf("overgrow"), dao.getAll(ash).map { it.name })
+        assertEquals(listOf("blaze"), dao.getAll(gary).map { it.name })
+    }
+
+    @Test
+    fun sameAbility_canBeFavouriteInTwoProfiles() = runTest {
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100))
+        dao.insert(FavouriteEntity(profileId = gary, id = 1, name = "overgrow", addedAt = 100))
+
+        assertEquals(1, dao.getAll(ash).size)
+        assertEquals(1, dao.getAll(gary).size)
+    }
+
+    @Test
+    fun deletingProfile_removesItsFavourites() = runTest {
+        dao.insert(FavouriteEntity(profileId = ash, id = 1, name = "overgrow", addedAt = 100))
+        dao.insert(FavouriteEntity(profileId = gary, id = 2, name = "blaze", addedAt = 100))
+
+        database.getProfileDao().deleteById(ash)
+
+        assertEquals(emptyList<FavouriteEntity>(), dao.getAll(ash))
+        assertEquals(1, dao.getAll(gary).size)
     }
 }

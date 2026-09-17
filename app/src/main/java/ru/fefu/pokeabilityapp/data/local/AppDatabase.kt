@@ -4,9 +4,10 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 
 @Database(
-    entities = [FavouriteEntity::class],
-    version = 1
+    entities = [FavouriteEntity::class, ProfileEntity::class],
+    version = 2
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getFavouriteDao(): FavouriteDao
+    abstract fun getProfileDao(): ProfileDao
 }
