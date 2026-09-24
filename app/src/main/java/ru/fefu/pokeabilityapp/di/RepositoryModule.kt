@@ -8,10 +8,12 @@ import ru.fefu.pokeabilityapp.data.repository.AbilityRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.FavouriteRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.ProfileRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.SettingsRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.TeamRepositoryImpl
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
 import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository
 import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository
+import ru.fefu.pokeabilityapp.domain.repository.TeamRepository
 import javax.inject.Singleton
 
 @Module
@@ -41,4 +43,10 @@ abstract class RepositoryModule {
     abstract fun bindProfileRepository(
         impl: ProfileRepositoryImpl
     ): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTeamRepository(
+        impl: TeamRepositoryImpl
+    ): TeamRepository
 }

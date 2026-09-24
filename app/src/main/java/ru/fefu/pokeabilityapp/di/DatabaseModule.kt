@@ -10,7 +10,9 @@ import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.data.local.FavouriteDao
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_1_2
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
 import ru.fefu.pokeabilityapp.data.local.ProfileDao
+import ru.fefu.pokeabilityapp.data.local.TeamDao
 import javax.inject.Singleton
 
 @Module
@@ -25,7 +27,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "pokeability.db"
         )
-            .addMigrations(MIGRATION_1_2)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
             .build()
 
     @Provides
@@ -37,4 +39,9 @@ object DatabaseModule {
     @Singleton
     fun provideProfileDao(db: AppDatabase): ProfileDao =
         db.getProfileDao()
+
+    @Provides
+    @Singleton
+    fun provideTeamDao(db: AppDatabase): TeamDao =
+        db.getTeamDao()
 }
