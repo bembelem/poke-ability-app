@@ -11,7 +11,9 @@ import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.data.local.FavouriteDao
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_1_2
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_3_4
 import ru.fefu.pokeabilityapp.data.local.ProfileDao
+import ru.fefu.pokeabilityapp.data.local.TagDao
 import ru.fefu.pokeabilityapp.data.local.TeamDao
 import javax.inject.Singleton
 
@@ -27,7 +29,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "pokeability.db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
             .build()
 
     @Provides
@@ -44,4 +46,9 @@ object DatabaseModule {
     @Singleton
     fun provideTeamDao(db: AppDatabase): TeamDao =
         db.getTeamDao()
+
+    @Provides
+    @Singleton
+    fun provideTagDao(db: AppDatabase): TagDao =
+        db.getTagDao()
 }

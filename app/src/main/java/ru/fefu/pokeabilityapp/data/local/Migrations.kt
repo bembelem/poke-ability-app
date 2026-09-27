@@ -72,3 +72,34 @@ val MIGRATION_2_3 = object : Migration(2, 3) {
         )
     }
 }
+
+val MIGRATION_3_4 = object : Migration(3, 4) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `tags` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`profileId` INTEGER NOT NULL, " +
+                "`name` TEXT NOT NULL, " +
+                "`colorArgb` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`profileId`) REFERENCES `profiles`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_tags_profileId` ON `tags` (`profileId`)")
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_tags_profileId_name` " +
+                "ON `tags` (`profileId`, `name`)"
+        )
+
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `slot_tags` (" +
+                "`slotId` INTEGER NOT NULL, " +
+                "`tagId` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`slotId`, `tagId`), " +
+                "FOREIGN KEY(`slotId`) REFERENCES `team_slots`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE , " +
+                "FOREIGN KEY(`tagId`) REFERENCES `tags`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_slot_tags_tagId` ON `slot_tags` (`tagId`)")
+    }
+}
