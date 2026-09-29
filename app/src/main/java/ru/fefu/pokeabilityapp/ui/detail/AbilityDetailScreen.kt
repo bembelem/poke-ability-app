@@ -25,6 +25,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -39,7 +41,7 @@ fun AbilityDetailScreen(
     onBack: () -> Unit,
     viewModel: AbilityDetailViewModel = hiltViewModel()
 ) {
-    val state = viewModel.uiState
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
 
     Scaffold(
         topBar = {
@@ -54,18 +56,18 @@ fun AbilityDetailScreen(
         }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
-            when (state) {
+            when (val current = state) {
                 is AbilityDetailUiState.Loading -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
                 is AbilityDetailUiState.Error -> {
                     ErrorState(
-                        message = state.message,
+                        message = current.message,
                         onRetry = { viewModel.loadDetail() }
                     )
                 }
                 is AbilityDetailUiState.Content -> {
-                    AbilityDetailContent(detail = state.detail)
+                    AbilityDetailContent(detail = current.detail)
                 }
             }
         }

@@ -1,16 +1,18 @@
 package ru.fefu.pokeabilityapp.ui.detail
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import javax.inject.Inject
-
 
 @HiltViewModel
 class AbilityDetailViewModel @Inject constructor(
@@ -19,9 +21,21 @@ class AbilityDetailViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val abilityId: Int = checkNotNull(savedStateHandle["abilityId"])
+    private val error = MutableStateFlow<String?>(null)
 
-    var uiState by mutableStateOf<AbilityDetailUiState>(AbilityDetailUiState.Loading)
-        private set
+    val uiState: StateFlow<AbilityDetailUiState> =
+        combine(repository.observeAbilityDetail(abilityId), error) { detail, message ->
+            when {
+                // кэш важнее ошибки сети: есть что показать, показываем
+                detail != null -> AbilityDetailUiState.Content(detail)
+                message != null -> AbilityDetailUiState.Error(message)
+                else -> AbilityDetailUiState.Loading
+            }
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = AbilityDetailUiState.Loading
+        )
 
     init {
         loadDetail()
@@ -29,12 +43,13 @@ class AbilityDetailViewModel @Inject constructor(
 
     fun loadDetail() {
         viewModelScope.launch {
-            uiState = AbilityDetailUiState.Loading
+            error.value = null
             try {
-                val detail = repository.getAbilityById(abilityId)
-                uiState = AbilityDetailUiState.Content(detail)
+                repository.refreshDetail(abilityId, force = false)
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                uiState = AbilityDetailUiState.Error(e.message ?: "Unknown error")
+                error.value = "Network error"
             }
         }
     }

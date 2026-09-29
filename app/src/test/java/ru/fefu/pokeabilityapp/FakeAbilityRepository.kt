@@ -1,29 +1,57 @@
 package ru.fefu.pokeabilityapp
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 
 class FakeAbilityRepository : AbilityRepository {
-    var abilities: List<AbilityItem> = emptyList()
-    var detail: AbilityDetail? = null
+
+    private val cached = MutableStateFlow<List<AbilityItem>>(emptyList())
+    private val detail = MutableStateFlow<AbilityDetail?>(null)
+
+    var refreshResult: List<AbilityItem> = emptyList()
+    var nextPage: List<AbilityItem> = emptyList()
     var searchResult: AbilityItem? = null
-    var failGetAbilities = false
-    var failGetDetail = false
+    var detailResult: AbilityDetail? = null
+
+    var failRefresh = false
+    var failLoadMore = false
     var failSearch = false
+    var failDetail = false
 
-    override suspend fun getAbilities(offset: Int): List<AbilityItem> {
-        if (failGetAbilities) error("getAbilities failed")
-        return abilities
+    var refreshCalls = 0
+        private set
+
+    fun seedCache(vararg items: AbilityItem) {
+        cached.value = items.toList()
     }
 
-    override suspend fun getAbilityById(id: Int): AbilityDetail {
-        if (failGetDetail) error("getAbilityById failed")
-        return detail ?: error("no detail set")
+    override fun observeAbilities(): Flow<List<AbilityItem>> = cached.asStateFlow()
+
+    override fun observeAbilityDetail(id: Int): Flow<AbilityDetail?> = detail.asStateFlow()
+
+    override suspend fun refreshFirstPage(force: Boolean) {
+        refreshCalls++
+        if (failRefresh) error("refresh failed")
+        cached.value = refreshResult
     }
 
-    override suspend fun getAbilityByName(name: String): AbilityItem? {
-        if (failSearch) error("searchByName failed")
+    override suspend fun loadNextPage(): Int {
+        if (failLoadMore) error("load next page failed")
+        cached.value = cached.value + nextPage
+        return nextPage.size
+    }
+
+    override suspend fun refreshDetail(id: Int, force: Boolean) {
+        if (failDetail) error("detail failed")
+        detail.value = detailResult
+    }
+
+    override suspend fun findByName(name: String): AbilityItem? {
+        if (failSearch) error("search failed")
         return searchResult
     }
 }

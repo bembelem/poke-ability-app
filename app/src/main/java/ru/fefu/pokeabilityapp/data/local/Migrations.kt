@@ -103,3 +103,23 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_slot_tags_tagId` ON `slot_tags` (`tagId`)")
     }
 }
+
+val MIGRATION_4_5 = object : Migration(4, 5) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `cached_abilities` (" +
+                "`id` INTEGER NOT NULL, " +
+                "`name` TEXT NOT NULL, " +
+                "`listOrder` INTEGER NOT NULL, " +
+                "`fetchedAt` INTEGER NOT NULL, " +
+                "`generation` TEXT, " +
+                "`isMainSeries` INTEGER, " +
+                "`shortEffect` TEXT, " +
+                "`fullEffect` TEXT, " +
+                "`flavorText` TEXT, " +
+                "`pokemonNames` TEXT, " +
+                "`detailFetchedAt` INTEGER, " +
+                "PRIMARY KEY(`id`))"
+        )
+    }
+}

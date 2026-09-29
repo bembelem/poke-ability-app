@@ -84,18 +84,31 @@ class MigrationTest {
     }
 
     @Test
-    fun fullChain1To4_keepsFavourites() {
+    fun migration4To5_createsAbilityCache() {
+        helper.createDatabase(dbName, 4).close()
+
+        val db = helper.runMigrationsAndValidate(dbName, 5, true, MIGRATION_4_5)
+
+        db.query("SELECT COUNT(*) FROM cached_abilities").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun fullChain1To5_keepsFavourites() {
         val oldDb = helper.createDatabase(dbName, 1)
         oldDb.execSQL("INSERT INTO favourites (id, name, addedAt) VALUES (1, 'overgrow', 100)")
         oldDb.close()
 
         val db = helper.runMigrationsAndValidate(
             dbName,
-            4,
+            5,
             true,
             MIGRATION_1_2,
             MIGRATION_2_3,
-            MIGRATION_3_4
+            MIGRATION_3_4,
+            MIGRATION_4_5
         )
 
         db.query("SELECT name FROM favourites").use { cursor ->

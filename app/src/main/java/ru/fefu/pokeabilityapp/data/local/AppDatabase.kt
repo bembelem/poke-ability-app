@@ -10,13 +10,15 @@ import androidx.room.RoomDatabase
         TeamEntity::class,
         TeamSlotEntity::class,
         TagEntity::class,
-        SlotTagCrossRef::class
+        SlotTagCrossRef::class,
+        CachedAbilityEntity::class
     ],
-    version = 4
+    version = 5
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getFavouriteDao(): FavouriteDao
     abstract fun getProfileDao(): ProfileDao
     abstract fun getTeamDao(): TeamDao
     abstract fun getTagDao(): TagDao
+    abstract fun getAbilityCacheDao(): AbilityCacheDao
 }

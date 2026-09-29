@@ -41,9 +41,9 @@ class AbilityListViewModelTest {
     }
 
     @Test
-    fun `first page success updates items`() = runTest {
+    fun `successful sync shows abilities from cache`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow, blaze)
+            refreshResult = listOf(overgrow, blaze)
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
@@ -55,9 +55,9 @@ class AbilityListViewModelTest {
     }
 
     @Test
-    fun `first page failure sets error message`() = runTest {
+    fun `sync failure with empty cache shows error`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            failGetAbilities = true
+            failRefresh = true
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
@@ -69,9 +69,23 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `sync failure with cached data keeps showing the list`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            seedCache(overgrow, blaze)
+            failRefresh = true
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertEquals(listOf(overgrow, blaze), state.items)
+        assertNull(state.errorMessage)
+    }
+
+    @Test
     fun `toggleFavourite adds item to favourites`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow, blaze)
+            refreshResult = listOf(overgrow, blaze)
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
@@ -88,7 +102,7 @@ class AbilityListViewModelTest {
             seed(overgrow)
         }
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow, blaze)
+            refreshResult = listOf(overgrow, blaze)
         }
         val viewModel = createViewModel(abilityRepo, favouriteRepo)
         advanceUntilIdle()
@@ -102,7 +116,7 @@ class AbilityListViewModelTest {
     @Test
     fun `toggleFavourite three times leaves one favourite`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow)
+            refreshResult = listOf(overgrow)
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
@@ -121,7 +135,7 @@ class AbilityListViewModelTest {
             seed(overgrow)
         }
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow, blaze)
+            refreshResult = listOf(overgrow, blaze)
         }
         val viewModel = createViewModel(abilityRepo, favouriteRepo)
         advanceUntilIdle()
@@ -135,15 +149,15 @@ class AbilityListViewModelTest {
     @Test
     fun `refresh after error loads first page again`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            failGetAbilities = true
+            failRefresh = true
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
         assertNotNull(viewModel.uiState.value.errorMessage)
 
-        abilityRepo.failGetAbilities = false
-        abilityRepo.abilities = listOf(overgrow)
+        abilityRepo.failRefresh = false
+        abilityRepo.refreshResult = listOf(overgrow)
         viewModel.refresh()
         advanceUntilIdle()
 
@@ -153,14 +167,29 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `refresh forces a new sync`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            refreshResult = listOf(overgrow)
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+        assertEquals(1, abilityRepo.refreshCalls)
+
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        assertEquals(2, abilityRepo.refreshCalls)
+    }
+
+    @Test
     fun `loadMore appends items to existing list`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }
+            refreshResult = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }
+            nextPage = listOf(AbilityItem(21, "blaze"))
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        abilityRepo.abilities = listOf(blaze)
         viewModel.loadMore()
         advanceUntilIdle()
 
@@ -170,12 +199,12 @@ class AbilityListViewModelTest {
     @Test
     fun `loadMore failure sets loadMoreError and keeps items`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }
+            refreshResult = List(20) { AbilityItem(it + 1, "ability-${it + 1}") }
+            failLoadMore = true
         }
         val viewModel = createViewModel(abilityRepo)
         advanceUntilIdle()
 
-        abilityRepo.failGetAbilities = true
         viewModel.loadMore()
         advanceUntilIdle()
 
@@ -188,7 +217,7 @@ class AbilityListViewModelTest {
     @Test
     fun `search error clears previous results`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
-            abilities = listOf(overgrow, blaze)
+            refreshResult = listOf(overgrow, blaze)
             searchResult = overgrow
         }
         val viewModel = createViewModel(abilityRepo)
