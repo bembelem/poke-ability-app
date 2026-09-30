@@ -123,3 +123,22 @@ val MIGRATION_4_5 = object : Migration(4, 5) {
         )
     }
 }
+
+val MIGRATION_5_6 = object : Migration(5, 6) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `history_entries` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`profileId` INTEGER NOT NULL, " +
+                "`abilityId` INTEGER NOT NULL, " +
+                "`abilityName` TEXT NOT NULL, " +
+                "`viewedAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`profileId`) REFERENCES `profiles`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL(
+            "CREATE INDEX IF NOT EXISTS `index_history_entries_profileId` " +
+                "ON `history_entries` (`profileId`)"
+        )
+    }
+}

@@ -9,14 +9,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
+import ru.fefu.pokeabilityapp.domain.repository.HistoryRepository
 import javax.inject.Inject
 
 @HiltViewModel
 class AbilityDetailViewModel @Inject constructor(
     private val repository: AbilityRepository,
+    private val historyRepository: HistoryRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -39,6 +43,10 @@ class AbilityDetailViewModel @Inject constructor(
 
     init {
         loadDetail()
+        viewModelScope.launch {
+            val detail = repository.observeAbilityDetail(abilityId).filterNotNull().first()
+            historyRepository.record(detail.id, detail.name)
+        }
     }
 
     fun loadDetail() {

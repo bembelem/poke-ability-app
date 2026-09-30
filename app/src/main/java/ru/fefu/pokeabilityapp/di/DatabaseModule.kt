@@ -10,10 +10,12 @@ import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.data.local.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.HistoryDao
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_1_2
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_3_4
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_4_5
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_5_6
 import ru.fefu.pokeabilityapp.data.local.ProfileDao
 import ru.fefu.pokeabilityapp.data.local.TagDao
 import ru.fefu.pokeabilityapp.data.local.TeamDao
@@ -31,7 +33,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "pokeability.db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
             .build()
 
     @Provides
@@ -58,4 +60,9 @@ object DatabaseModule {
     @Singleton
     fun provideAbilityCacheDao(db: AppDatabase): AbilityCacheDao =
         db.getAbilityCacheDao()
+
+    @Provides
+    @Singleton
+    fun provideHistoryDao(db: AppDatabase): HistoryDao =
+        db.getHistoryDao()
 }

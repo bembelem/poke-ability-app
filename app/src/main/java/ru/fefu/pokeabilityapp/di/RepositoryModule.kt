@@ -6,12 +6,14 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.repository.AbilityRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.FavouriteRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.HistoryRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.ProfileRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.SettingsRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.TagRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.TeamRepositoryImpl
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
+import ru.fefu.pokeabilityapp.domain.repository.HistoryRepository
 import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository
 import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository
 import ru.fefu.pokeabilityapp.domain.repository.TagRepository
@@ -57,4 +59,10 @@ abstract class RepositoryModule {
     abstract fun bindTagRepository(
         impl: TagRepositoryImpl
     ): TagRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHistoryRepository(
+        impl: HistoryRepositoryImpl
+    ): HistoryRepository
 }
