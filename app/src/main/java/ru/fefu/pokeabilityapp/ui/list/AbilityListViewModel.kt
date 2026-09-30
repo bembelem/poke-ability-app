@@ -18,7 +18,6 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scan
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -90,9 +89,11 @@ class AbilityListViewModel @Inject constructor(
     private val searchState: StateFlow<SearchState> =
         combine(
             queryFlow.map { it.trim() }.debounce(400).distinctUntilChanged(),
-            refreshRequests.onStart { emit(Unit) }
-        ) { query, _ -> query }
-            .flatMapLatest { query ->
+            // счётчик попыток входит в ключ, поэтому повтор перезапускает поиск с тем же запросом
+            refreshRequests.scan(0) { attempt, _ -> attempt + 1 }
+        ) { query, attempt -> query to attempt }
+            .distinctUntilChanged()
+            .flatMapLatest { (query, _) ->
                 if (query.isBlank()) {
                     flowOf(SearchEvent.Reset)
                 } else {

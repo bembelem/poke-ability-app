@@ -215,6 +215,28 @@ class AbilityListViewModelTest {
     }
 
     @Test
+    fun `refresh retries a failed search with the same query`() = runTest {
+        val abilityRepo = FakeAbilityRepository().apply {
+            failSearch = true
+        }
+        val viewModel = createViewModel(abilityRepo)
+        advanceUntilIdle()
+
+        viewModel.onSearchQueryChange("overgrow")
+        advanceUntilIdle()
+        assertNotNull(viewModel.uiState.value.errorMessage)
+
+        abilityRepo.failSearch = false
+        abilityRepo.searchResult = overgrow
+        viewModel.refresh()
+        advanceUntilIdle()
+
+        val state = viewModel.uiState.value
+        assertNull(state.errorMessage)
+        assertEquals(listOf(overgrow), state.items)
+    }
+
+    @Test
     fun `search error clears previous results`() = runTest {
         val abilityRepo = FakeAbilityRepository().apply {
             refreshResult = listOf(overgrow, blaze)
