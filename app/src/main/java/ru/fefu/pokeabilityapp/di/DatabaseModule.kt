@@ -16,6 +16,8 @@ import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_3_4
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_4_5
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_5_6
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_6_7
+import ru.fefu.pokeabilityapp.data.local.PokemonCacheDao
 import ru.fefu.pokeabilityapp.data.local.ProfileDao
 import ru.fefu.pokeabilityapp.data.local.TagDao
 import ru.fefu.pokeabilityapp.data.local.TeamDao
@@ -33,7 +35,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "pokeability.db"
         )
-            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6)
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7)
             .build()
 
     @Provides
@@ -65,4 +67,9 @@ object DatabaseModule {
     @Singleton
     fun provideHistoryDao(db: AppDatabase): HistoryDao =
         db.getHistoryDao()
+
+    @Provides
+    @Singleton
+    fun providePokemonCacheDao(db: AppDatabase): PokemonCacheDao =
+        db.getPokemonCacheDao()
 }

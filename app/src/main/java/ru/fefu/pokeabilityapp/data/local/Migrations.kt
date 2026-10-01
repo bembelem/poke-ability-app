@@ -142,3 +142,39 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         )
     }
 }
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `cached_pokemon` (" +
+                "`id` INTEGER NOT NULL, " +
+                "`name` TEXT NOT NULL, " +
+                "`listOrder` INTEGER NOT NULL, " +
+                "`fetchedAt` INTEGER NOT NULL, " +
+                "`spriteUrl` TEXT, " +
+                "`type1` TEXT, " +
+                "`type2` TEXT, " +
+                "`detailFetchedAt` INTEGER, " +
+                "PRIMARY KEY(`id`))"
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `pokemon_abilities` (" +
+                "`pokemonId` INTEGER NOT NULL, " +
+                "`abilityId` INTEGER NOT NULL, " +
+                "`abilityName` TEXT NOT NULL, " +
+                "`isHidden` INTEGER NOT NULL, " +
+                "`slot` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`pokemonId`, `abilityId`), " +
+                "FOREIGN KEY(`pokemonId`) REFERENCES `cached_pokemon`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `type_effectiveness` (" +
+                "`attacking` TEXT NOT NULL, " +
+                "`defending` TEXT NOT NULL, " +
+                "`multiplier` REAL NOT NULL, " +
+                "`fetchedAt` INTEGER NOT NULL, " +
+                "PRIMARY KEY(`attacking`, `defending`))"
+        )
+    }
+}

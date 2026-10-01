@@ -5,6 +5,9 @@ import retrofit2.http.Path
 import retrofit2.http.Query
 import ru.fefu.pokeabilityapp.data.dto.AbilityDto
 import ru.fefu.pokeabilityapp.data.dto.AbilityListDto
+import ru.fefu.pokeabilityapp.data.dto.PokemonDto
+import ru.fefu.pokeabilityapp.data.dto.PokemonListDto
+import ru.fefu.pokeabilityapp.data.dto.TypeDto
 
 interface PokeApiService {
     @GET("ability")
@@ -18,4 +21,16 @@ interface PokeApiService {
 
     @GET("ability/{name}")
     suspend fun getAbilityByName(@Path("name") name: String): AbilityDto
+
+    @GET("pokemon")
+    suspend fun getPokemonList(
+        @Query("limit") limit: Int = 20,
+        @Query("offset") offset: Int = 0
+    ): PokemonListDto
+
+    @GET("pokemon/{id}")
+    suspend fun getPokemonById(@Path("id") id: Int): PokemonDto
+
+    @GET("type/{id}")
+    suspend fun getType(@Path("id") id: Int): TypeDto
 }

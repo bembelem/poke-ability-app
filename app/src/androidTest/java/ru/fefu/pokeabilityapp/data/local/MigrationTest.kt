@@ -108,20 +108,35 @@ class MigrationTest {
     }
 
     @Test
-    fun fullChain1To6_keepsFavourites() {
+    fun migration6To7_createsPokemonCache() {
+        helper.createDatabase(dbName, 6).close()
+
+        val db = helper.runMigrationsAndValidate(dbName, 7, true, MIGRATION_6_7)
+
+        listOf("cached_pokemon", "pokemon_abilities", "type_effectiveness").forEach { table ->
+            db.query("SELECT COUNT(*) FROM $table").use { cursor ->
+                assertTrue(cursor.moveToFirst())
+                assertEquals(0, cursor.getInt(0))
+            }
+        }
+    }
+
+    @Test
+    fun fullChain1To7_keepsFavourites() {
         val oldDb = helper.createDatabase(dbName, 1)
         oldDb.execSQL("INSERT INTO favourites (id, name, addedAt) VALUES (1, 'overgrow', 100)")
         oldDb.close()
 
         val db = helper.runMigrationsAndValidate(
             dbName,
-            6,
+            7,
             true,
             MIGRATION_1_2,
             MIGRATION_2_3,
             MIGRATION_3_4,
             MIGRATION_4_5,
-            MIGRATION_5_6
+            MIGRATION_5_6,
+            MIGRATION_6_7
         )
 
         db.query("SELECT name FROM favourites").use { cursor ->

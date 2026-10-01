@@ -12,9 +12,12 @@ import androidx.room.RoomDatabase
         TagEntity::class,
         SlotTagCrossRef::class,
         CachedAbilityEntity::class,
-        HistoryEntryEntity::class
+        HistoryEntryEntity::class,
+        CachedPokemonEntity::class,
+        PokemonAbilityEntity::class,
+        TypeEffectivenessEntity::class
     ],
-    version = 6
+    version = 7
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getFavouriteDao(): FavouriteDao
@@ -23,4 +26,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun getTagDao(): TagDao
     abstract fun getAbilityCacheDao(): AbilityCacheDao
     abstract fun getHistoryDao(): HistoryDao
+    abstract fun getPokemonCacheDao(): PokemonCacheDao
 }
