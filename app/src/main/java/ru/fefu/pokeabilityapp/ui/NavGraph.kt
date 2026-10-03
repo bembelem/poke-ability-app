@@ -5,6 +5,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -29,13 +30,26 @@ import ru.fefu.pokeabilityapp.ui.list.AbilityListScreen
 import ru.fefu.pokeabilityapp.ui.list.AbilityListViewModel
 import ru.fefu.pokeabilityapp.ui.settings.SettingsScreen
 import ru.fefu.pokeabilityapp.ui.settings.SettingsViewModel
+import ru.fefu.pokeabilityapp.ui.teams.PokemonPickerScreen
+import ru.fefu.pokeabilityapp.ui.teams.PokemonPickerViewModel
+import ru.fefu.pokeabilityapp.ui.teams.TeamEditorScreen
+import ru.fefu.pokeabilityapp.ui.teams.TeamEditorViewModel
+import ru.fefu.pokeabilityapp.ui.teams.TeamsScreen
+import ru.fefu.pokeabilityapp.ui.teams.TeamsViewModel
 
 sealed class Screen(val route: String) {
     data object List : Screen("ability_list")
+    data object Teams : Screen("teams")
     data object History : Screen("history")
     data object Settings : Screen("settings")
     data object Detail : Screen("ability_detail/{abilityId}") {
         fun createRoute(id: Int) = "ability_detail/$id"
+    }
+    data object TeamEditor : Screen("team_editor/{teamId}") {
+        fun createRoute(teamId: Long) = "team_editor/$teamId"
+    }
+    data object PokemonPicker : Screen("pokemon_picker/{teamId}/{position}") {
+        fun createRoute(teamId: Long, position: Int) = "pokemon_picker/$teamId/$position"
     }
 }
 
@@ -43,6 +57,7 @@ private data class BottomItem(val screen: Screen, val label: String, val icon: I
 
 private val bottomItems = listOf(
     BottomItem(Screen.List, "Способности", Icons.Default.List),
+    BottomItem(Screen.Teams, "Команды", Icons.Default.Star),
     BottomItem(Screen.History, "История", Icons.Default.DateRange),
     BottomItem(Screen.Settings, "Настройки", Icons.Default.Settings)
 )
@@ -92,6 +107,54 @@ fun NavGraph(navController: NavHostController) {
                     onRetry = { viewModel.refresh() },
                     onQueryChange = { viewModel.onSearchQueryChange(it) },
                     onClearSearch = { viewModel.clearSearch() },
+                )
+            }
+            composable(Screen.Teams.route) {
+                val viewModel: TeamsViewModel = hiltViewModel()
+                val teams by viewModel.teams.collectAsStateWithLifecycle()
+                TeamsScreen(
+                    teams = teams,
+                    onTeamClick = { id -> navController.navigate(Screen.TeamEditor.createRoute(id)) },
+                    onCreate = { name ->
+                        viewModel.createTeam(name) { id ->
+                            navController.navigate(Screen.TeamEditor.createRoute(id))
+                        }
+                    },
+                    onDelete = { viewModel.deleteTeam(it) }
+                )
+            }
+            composable(
+                route = Screen.TeamEditor.route,
+                arguments = listOf(navArgument("teamId") { type = NavType.LongType })
+            ) { entry ->
+                val teamId = entry.arguments?.getLong("teamId") ?: return@composable
+                val viewModel: TeamEditorViewModel = hiltViewModel()
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                TeamEditorScreen(
+                    state = state,
+                    onPickPokemon = { position ->
+                        navController.navigate(Screen.PokemonPicker.createRoute(teamId, position))
+                    },
+                    onSelectAbility = { slotId, option -> viewModel.selectAbility(slotId, option) },
+                    onClearSlot = { viewModel.clearSlot(it) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
+            composable(
+                route = Screen.PokemonPicker.route,
+                arguments = listOf(
+                    navArgument("teamId") { type = NavType.LongType },
+                    navArgument("position") { type = NavType.IntType }
+                )
+            ) {
+                val viewModel: PokemonPickerViewModel = hiltViewModel()
+                val state by viewModel.uiState.collectAsStateWithLifecycle()
+                PokemonPickerScreen(
+                    state = state,
+                    onQueryChange = { viewModel.onQueryChange(it) },
+                    onPick = { item -> viewModel.pick(item) { navController.popBackStack() } },
+                    onLoadMore = { viewModel.loadMore() },
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.History.route) {
