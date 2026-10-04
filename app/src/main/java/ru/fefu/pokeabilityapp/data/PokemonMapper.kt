@@ -49,13 +49,18 @@ fun PokemonDto.toAbilityEntities(): List<PokemonAbilityEntity> =
         )
     }
 
-fun CachedPokemonEntity.toItem(): PokemonItem = PokemonItem(id, name, spriteUrl)
+// список не отдаёт картинку, но у PokeAPI её адрес строится из id
+private fun spriteUrlFor(id: Int): String =
+    "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/$id.png"
+
+fun CachedPokemonEntity.toItem(): PokemonItem =
+    PokemonItem(id, name, spriteUrl ?: spriteUrlFor(id))
 
 fun CachedPokemonEntity.toDetail(abilities: List<PokemonAbilityEntity>): PokemonDetail =
     PokemonDetail(
         id = id,
         name = name,
-        spriteUrl = spriteUrl,
+        spriteUrl = spriteUrl ?: spriteUrlFor(id),
         types = listOfNotNull(type1, type2).mapNotNull { PokeType.fromApiName(it) },
         abilities = abilities.map {
             PokemonAbilityOption(it.abilityId, it.abilityName, it.isHidden)
