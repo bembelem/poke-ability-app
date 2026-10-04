@@ -67,9 +67,30 @@ class SettingsRepositoryImplTest {
     @Test
     fun `unknown stored theme falls back to system`() = runBlocking {
         val dataStore = createDataStore()
-        dataStore.edit { it[stringPreferencesKey("theme_mode")] = "NEON" }
         val repository = SettingsRepositoryImpl(dataStore)
+        repository.setActiveProfile(1)
+        dataStore.edit { it[stringPreferencesKey("p1_theme_mode")] = "NEON" }
 
         assertEquals(ThemeMode.SYSTEM, repository.observeSettings().first().themeMode)
+    }
+
+    @Test
+    fun `each profile keeps its own settings`() = runBlocking {
+        val repository = SettingsRepositoryImpl(createDataStore())
+
+        repository.setActiveProfile(1)
+        repository.setThemeMode(ThemeMode.DARK)
+        repository.setCacheTtlHours(6)
+
+        repository.setActiveProfile(2)
+        val second = repository.observeSettings().first()
+        assertEquals(ThemeMode.SYSTEM, second.themeMode)
+        assertEquals(AppSettings().cacheTtlHours, second.cacheTtlHours)
+
+        repository.setThemeMode(ThemeMode.LIGHT)
+        repository.setActiveProfile(1)
+        val first = repository.observeSettings().first()
+        assertEquals(ThemeMode.DARK, first.themeMode)
+        assertEquals(6, first.cacheTtlHours)
     }
 }
