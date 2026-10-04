@@ -160,6 +160,25 @@ class CoverageAnalyzerTest {
     }
 
     @Test
+    fun `exposure keeps multiplier of every member in team order`() {
+        val chart = chartOf(
+            Triple(GROUND, ELECTRIC, 2.0),
+            Triple(GROUND, FLYING, 0.0),
+        )
+        val team = listOf(
+            TeamMember(1, "pikachu", listOf(ELECTRIC)),
+            TeamMember(2, "pidgey", listOf(FLYING)),
+            TeamMember(3, "geodude", listOf(ROCK)),
+        )
+
+        val ground = analyzeTeam(team, chart, threatThreshold = 1)
+            .exposures.single { it.type == GROUND }
+
+        assertEquals(listOf(1L, 2L, 3L), ground.perMember.map { it.slotId })
+        assertEquals(listOf(2.0, 0.0, 1.0), ground.perMember.map { it.multiplier })
+    }
+
+    @Test
     fun `coverage reports every type`() {
         val coverage = analyzeTeam(emptyList(), TypeChart.EMPTY, threatThreshold = 1)
 

@@ -23,12 +23,25 @@ data class TeamMember(
     val abilityName: String? = null,
 )
 
+data class MemberMultiplier(
+    val slotId: Long,
+    val pokemonName: String,
+    val multiplier: Double,
+)
+
 data class TypeExposure(
     val type: PokeType,
-    val weakMembers: List<String>,
-    val resistantMembers: List<String>,
-    val maxMultiplier: Double,
-)
+    val perMember: List<MemberMultiplier>,
+) {
+    val weakMembers: List<String>
+        get() = perMember.filter { it.multiplier > 1.0 }.map { it.pokemonName }
+
+    val resistantMembers: List<String>
+        get() = perMember.filter { it.multiplier < 1.0 }.map { it.pokemonName }
+
+    val maxMultiplier: Double
+        get() = perMember.maxOfOrNull { it.multiplier } ?: 0.0
+}
 
 data class TeamCoverage(
     val exposures: List<TypeExposure>,
@@ -59,24 +72,20 @@ fun analyzeTeam(
     val threshold = threatThreshold.coerceAtLeast(1)
 
     val exposures = PokeType.entries.map { attacking ->
-        val weak = mutableListOf<String>()
-        val resistant = mutableListOf<String>()
-        var max = 0.0
-
-        members.forEach { member ->
-            val multiplier = defensiveMultiplier(attacking, member.types, member.abilityName, chart)
-            when {
-                multiplier > 1.0 -> weak += member.pokemonName
-                multiplier < 1.0 -> resistant += member.pokemonName
-            }
-            if (multiplier > max) max = multiplier
-        }
-
         TypeExposure(
             type = attacking,
-            weakMembers = weak,
-            resistantMembers = resistant,
-            maxMultiplier = max,
+            perMember = members.map { member ->
+                MemberMultiplier(
+                    slotId = member.slotId,
+                    pokemonName = member.pokemonName,
+                    multiplier = defensiveMultiplier(
+                        attacking,
+                        member.types,
+                        member.abilityName,
+                        chart
+                    ),
+                )
+            },
         )
     }
 
