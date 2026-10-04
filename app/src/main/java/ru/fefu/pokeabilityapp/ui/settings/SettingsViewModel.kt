@@ -35,4 +35,8 @@ class SettingsViewModel @Inject constructor(
     fun setHistoryEnabled(enabled: Boolean) {
         viewModelScope.launch { repository.setHistoryEnabled(enabled) }
     }
+
+    fun setThreatThreshold(value: Int) {
+        viewModelScope.launch { repository.setThreatThreshold(value) }
+    }
 }

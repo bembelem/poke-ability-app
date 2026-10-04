@@ -173,6 +173,7 @@ fun NavGraph(navController: NavHostController) {
                     settings = settings,
                     onThemeChange = { viewModel.setThemeMode(it) },
                     onCacheTtlChange = { viewModel.setCacheTtlHours(it) },
+                    onThreatThresholdChange = { viewModel.setThreatThreshold(it) },
                     onHistoryEnabledChange = { viewModel.setHistoryEnabled(it) }
                 )
             }
