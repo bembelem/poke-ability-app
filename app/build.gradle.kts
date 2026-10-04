@@ -45,6 +45,10 @@ android {
     sourceSets {
         getByName("androidTest") {
             assets.srcDirs("$projectDir/schemas")
+            java.srcDirs("src/sharedTest/java")
+        }
+        getByName("test") {
+            java.srcDirs("src/sharedTest/java")
         }
     }
 }
