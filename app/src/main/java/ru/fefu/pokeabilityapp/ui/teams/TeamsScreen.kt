@@ -10,17 +10,14 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,6 +30,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import ru.fefu.pokeabilityapp.domain.model.TEAM_SIZE
 import ru.fefu.pokeabilityapp.domain.model.Team
+import ru.fefu.pokeabilityapp.ui.common.NameDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,7 +82,8 @@ fun TeamsScreen(
     }
 
     if (showDialog) {
-        CreateTeamDialog(
+        NameDialog(
+            title = "Новая команда",
             onDismiss = { showDialog = false },
             onConfirm = { name ->
                 showDialog = false
@@ -92,33 +91,4 @@ fun TeamsScreen(
             }
         )
     }
-}
-
-@Composable
-private fun CreateTeamDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
-    var name by remember { mutableStateOf("") }
-
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Новая команда") },
-        text = {
-            OutlinedTextField(
-                value = name,
-                onValueChange = { name = it },
-                singleLine = true,
-                placeholder = { Text("Название") }
-            )
-        },
-        confirmButton = {
-            TextButton(
-                onClick = { onConfirm(name) },
-                enabled = name.isNotBlank()
-            ) {
-                Text("Создать")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Отмена") }
-        }
-    )
 }

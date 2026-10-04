@@ -16,6 +16,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +29,8 @@ import ru.fefu.pokeabilityapp.domain.model.ThemeMode
 @Composable
 fun SettingsScreen(
     settings: AppSettings,
+    activeProfileName: String,
+    onProfilesClick: () -> Unit,
     onThemeChange: (ThemeMode) -> Unit,
     onCacheTtlChange: (Int) -> Unit,
     onHistoryEnabledChange: (Boolean) -> Unit
@@ -43,6 +46,20 @@ fun SettingsScreen(
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text("Профиль", style = MaterialTheme.typography.titleMedium)
+                    Text(activeProfileName, style = MaterialTheme.typography.bodyMedium)
+                }
+                TextButton(onClick = onProfilesClick) { Text("Сменить") }
+            }
+
+            HorizontalDivider()
+
             Text("Тема", style = MaterialTheme.typography.titleMedium)
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 ThemeMode.entries.forEach { mode ->

@@ -27,6 +27,8 @@ import ru.fefu.pokeabilityapp.ui.history.HistoryScreen
 import ru.fefu.pokeabilityapp.ui.history.HistoryViewModel
 import ru.fefu.pokeabilityapp.ui.list.AbilityListScreen
 import ru.fefu.pokeabilityapp.ui.list.AbilityListViewModel
+import ru.fefu.pokeabilityapp.ui.profiles.ProfilesScreen
+import ru.fefu.pokeabilityapp.ui.profiles.ProfilesViewModel
 import ru.fefu.pokeabilityapp.ui.settings.SettingsScreen
 import ru.fefu.pokeabilityapp.ui.settings.SettingsViewModel
 import ru.fefu.pokeabilityapp.ui.teams.PokemonPickerScreen
@@ -41,6 +43,7 @@ sealed class Screen(val route: String) {
     data object Teams : Screen("teams")
     data object History : Screen("history")
     data object Settings : Screen("settings")
+    data object Profiles : Screen("profiles")
     data object Detail : Screen("ability_detail/{abilityId}") {
         fun createRoute(id: Int) = "ability_detail/$id"
     }
@@ -166,11 +169,25 @@ fun NavGraph(navController: NavHostController) {
                     onBack = { navController.popBackStack() }
                 )
             }
+            composable(Screen.Profiles.route) {
+                val viewModel: ProfilesViewModel = hiltViewModel()
+                val profiles by viewModel.profiles.collectAsStateWithLifecycle()
+                ProfilesScreen(
+                    profiles = profiles,
+                    onSelect = { viewModel.select(it) },
+                    onCreate = { viewModel.create(it) },
+                    onDelete = { viewModel.delete(it) },
+                    onBack = { navController.popBackStack() }
+                )
+            }
             composable(Screen.Settings.route) {
                 val viewModel: SettingsViewModel = hiltViewModel()
                 val settings by viewModel.settings.collectAsStateWithLifecycle()
+                val profileName by viewModel.activeProfileName.collectAsStateWithLifecycle()
                 SettingsScreen(
                     settings = settings,
+                    activeProfileName = profileName,
+                    onProfilesClick = { navController.navigate(Screen.Profiles.route) },
                     onThemeChange = { viewModel.setThemeMode(it) },
                     onCacheTtlChange = { viewModel.setCacheTtlHours(it) },
                     onHistoryEnabledChange = { viewModel.setHistoryEnabled(it) }
