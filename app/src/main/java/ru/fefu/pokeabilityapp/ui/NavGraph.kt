@@ -2,7 +2,6 @@ package ru.fefu.pokeabilityapp.ui
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
@@ -56,9 +55,8 @@ sealed class Screen(val route: String) {
 private data class BottomItem(val screen: Screen, val label: String, val icon: ImageVector)
 
 private val bottomItems = listOf(
-    BottomItem(Screen.List, "Способности", Icons.Default.List),
     BottomItem(Screen.Teams, "Команды", Icons.Default.Star),
-    BottomItem(Screen.History, "История", Icons.Default.DateRange),
+    BottomItem(Screen.List, "Способности", Icons.Default.List),
     BottomItem(Screen.Settings, "Настройки", Icons.Default.Settings)
 )
 
@@ -77,7 +75,7 @@ fun NavGraph(navController: NavHostController) {
                             selected = currentRoute == item.screen.route,
                             onClick = {
                                 navController.navigate(item.screen.route) {
-                                    popUpTo(Screen.List.route) { saveState = true }
+                                    popUpTo(Screen.Teams.route) { saveState = true }
                                     launchSingleTop = true
                                     restoreState = true
                                 }
@@ -92,7 +90,7 @@ fun NavGraph(navController: NavHostController) {
     ) { padding ->
         NavHost(
             navController = navController,
-            startDestination = Screen.List.route,
+            startDestination = Screen.Teams.route,
             modifier = Modifier.padding(padding)
         ) {
             composable(Screen.List.route) {
@@ -107,6 +105,7 @@ fun NavGraph(navController: NavHostController) {
                     onRetry = { viewModel.refresh() },
                     onQueryChange = { viewModel.onSearchQueryChange(it) },
                     onClearSearch = { viewModel.clearSearch() },
+                    onHistoryClick = { navController.navigate(Screen.History.route) },
                 )
             }
             composable(Screen.Teams.route) {
@@ -163,7 +162,8 @@ fun NavGraph(navController: NavHostController) {
                 HistoryScreen(
                     entries = entries,
                     onEntryClick = { id -> navController.navigate(Screen.Detail.createRoute(id)) },
-                    onClear = { viewModel.clear() }
+                    onClear = { viewModel.clear() },
+                    onBack = { navController.popBackStack() }
                 )
             }
             composable(Screen.Settings.route) {

@@ -50,6 +50,7 @@ class AbilityListScreenTest {
                 onRetry = {},
                 onQueryChange = {},
                 onClearSearch = {},
+                onHistoryClick = {},
             )
         }
 
@@ -118,6 +119,7 @@ class AbilityListScreenTest {
                 onRetry = {},
                 onQueryChange = {},
                 onClearSearch = {},
+                onHistoryClick = {},
             )
         }
 
@@ -139,6 +141,7 @@ class AbilityListScreenTest {
                 onRetry = {},
                 onQueryChange = {},
                 onClearSearch = {},
+                onHistoryClick = {},
             )
         }
 

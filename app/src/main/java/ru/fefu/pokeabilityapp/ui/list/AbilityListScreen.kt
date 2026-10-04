@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.CircularProgressIndicator
@@ -49,9 +50,19 @@ fun AbilityListScreen(
     onRetry: () -> Unit,
     onQueryChange: (String) -> Unit,
     onClearSearch: () -> Unit,
+    onHistoryClick: () -> Unit,
 ) {
     Scaffold(
-        topBar = { TopAppBar(title = { Text("Poke Abilities") }) }
+        topBar = {
+            TopAppBar(
+                title = { Text("Poke Abilities") },
+                actions = {
+                    IconButton(onClick = onHistoryClick) {
+                        Icon(Icons.Default.DateRange, contentDescription = "История")
+                    }
+                }
+            )
+        }
     ) { padding ->
         Box(modifier = Modifier.padding(padding).fillMaxSize()) {
             when {
