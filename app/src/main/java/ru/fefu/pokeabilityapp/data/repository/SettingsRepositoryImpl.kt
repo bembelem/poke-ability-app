@@ -28,7 +28,6 @@ class SettingsRepositoryImpl @Inject constructor(
         val prefetchTeamsForOffline = booleanPreferencesKey("prefetch_teams_for_offline")
         val historyEnabled = booleanPreferencesKey("history_enabled")
         val historyRetentionDays = intPreferencesKey("history_retention_days")
-        val threatThreshold = intPreferencesKey("threat_threshold")
     }
 
     override fun observeSettings(): Flow<AppSettings> = dataStore.data.map { prefs ->
@@ -44,7 +43,6 @@ class SettingsRepositoryImpl @Inject constructor(
             historyEnabled = prefs[Keys.historyEnabled] ?: defaults.historyEnabled,
             historyRetentionDays = prefs[Keys.historyRetentionDays]
                 ?: defaults.historyRetentionDays,
-            threatThreshold = prefs[Keys.threatThreshold] ?: defaults.threatThreshold,
         )
     }
 
@@ -78,10 +76,6 @@ class SettingsRepositoryImpl @Inject constructor(
 
     override suspend fun setHistoryRetentionDays(days: Int) = update {
         it[Keys.historyRetentionDays] = days.coerceAtLeast(1)
-    }
-
-    override suspend fun setThreatThreshold(value: Int) = update {
-        it[Keys.threatThreshold] = value.coerceAtLeast(1)
     }
 
     private suspend fun update(block: (MutablePreferences) -> Unit) {

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.fefu.pokeabilityapp.domain.coverage.THREAT_THRESHOLD
 import ru.fefu.pokeabilityapp.domain.coverage.TeamCoverage
 import ru.fefu.pokeabilityapp.domain.coverage.TeamMember
 import ru.fefu.pokeabilityapp.domain.coverage.analyzeTeam
@@ -24,7 +25,6 @@ import ru.fefu.pokeabilityapp.domain.model.TEAM_SIZE
 import ru.fefu.pokeabilityapp.domain.model.Team
 import ru.fefu.pokeabilityapp.domain.model.TypeChart
 import ru.fefu.pokeabilityapp.domain.repository.PokemonRepository
-import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository
 import ru.fefu.pokeabilityapp.domain.repository.TeamRepository
 import javax.inject.Inject
 
@@ -50,7 +50,6 @@ data class TeamEditorUiState(
 class TeamEditorViewModel @Inject constructor(
     private val teamRepository: TeamRepository,
     private val pokemonRepository: PokemonRepository,
-    settingsRepository: SettingsRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -81,14 +80,13 @@ class TeamEditorViewModel @Inject constructor(
     val uiState: StateFlow<TeamEditorUiState> = combine(
         teamFlow,
         detailsFlow,
-        pokemonRepository.observeTypeChart(),
-        settingsRepository.observeSettings().map { it.threatThreshold }.distinctUntilChanged()
-    ) { team, details, chart, threshold ->
+        pokemonRepository.observeTypeChart()
+    ) { team, details, chart ->
         val detailsById = details.associateBy { it.id }
         TeamEditorUiState(
             teamName = team?.name.orEmpty(),
             slots = buildSlots(team, detailsById),
-            coverage = buildCoverage(team, detailsById, chart, threshold),
+            coverage = buildCoverage(team, detailsById, chart),
             chartReady = !chart.isEmpty
         )
     }.stateIn(
@@ -117,8 +115,7 @@ class TeamEditorViewModel @Inject constructor(
     private fun buildCoverage(
         team: Team?,
         detailsById: Map<Int, PokemonDetail>,
-        chart: TypeChart,
-        threshold: Int
+        chart: TypeChart
     ): TeamCoverage? {
         if (team == null || chart.isEmpty) return null
         val members = team.slots.mapNotNull { slot ->
@@ -132,7 +129,7 @@ class TeamEditorViewModel @Inject constructor(
             )
         }
         if (members.isEmpty()) return null
-        return analyzeTeam(members, chart, threshold)
+        return analyzeTeam(members, chart, THREAT_THRESHOLD)
     }
 
     fun selectAbility(slotId: Long, option: PokemonAbilityOption?) {

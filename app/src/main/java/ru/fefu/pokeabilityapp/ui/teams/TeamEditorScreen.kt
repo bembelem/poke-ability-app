@@ -45,6 +45,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
+import ru.fefu.pokeabilityapp.domain.coverage.THREAT_THRESHOLD
 import ru.fefu.pokeabilityapp.domain.coverage.TeamCoverage
 import ru.fefu.pokeabilityapp.domain.coverage.TypeExposure
 import ru.fefu.pokeabilityapp.domain.model.PokeType
@@ -191,7 +192,7 @@ private fun CoverageSection(coverage: TeamCoverage?, chartReady: Boolean, slots:
                         "0: иммунитет, от типа или способности\n" +
                         "пусто: обычный урон\n\n" +
                         "«Слаб»: сколько покемонов получают увеличенный урон. " +
-                        "Подсвечено, если их не меньше порога угрозы из настроек.\n" +
+                        "Подсвечено, если таких $THREAT_THRESHOLD и больше: это главные угрозы.\n" +
                         "«Сопр»: сколько покемонов урон уменьшают."
                 )
             },

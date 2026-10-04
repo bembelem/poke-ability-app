@@ -16,6 +16,9 @@ private val abilityImmunities = mapOf(
     "sap-sipper" to PokeType.GRASS,
 )
 
+// столько членов команды должны получать увеличенный урон, чтобы тип стал угрозой
+const val THREAT_THRESHOLD = 3
+
 data class TeamMember(
     val slotId: Long,
     val pokemonName: String,

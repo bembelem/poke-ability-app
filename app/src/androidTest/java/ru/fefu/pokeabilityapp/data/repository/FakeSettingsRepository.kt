@@ -44,8 +44,4 @@ class FakeSettingsRepository(initial: AppSettings = AppSettings()) : SettingsRep
     override suspend fun setHistoryRetentionDays(days: Int) {
         state.value = state.value.copy(historyRetentionDays = days)
     }
-
-    override suspend fun setThreatThreshold(value: Int) {
-        state.value = state.value.copy(threatThreshold = value)
-    }
 }

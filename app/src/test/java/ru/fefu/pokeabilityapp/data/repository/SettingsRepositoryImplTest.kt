@@ -56,15 +56,6 @@ class SettingsRepositoryImplTest {
     }
 
     @Test
-    fun `threat threshold is persisted`() = runBlocking {
-        val repository = SettingsRepositoryImpl(createDataStore())
-
-        repository.setThreatThreshold(2)
-
-        assertEquals(2, repository.observeSettings().first().threatThreshold)
-    }
-
-    @Test
     fun `cache ttl below one hour is clamped`() = runBlocking {
         val repository = SettingsRepositoryImpl(createDataStore())
 

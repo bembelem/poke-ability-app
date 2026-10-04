@@ -11,7 +11,6 @@ data class AppSettings(
     val prefetchTeamsForOffline: Boolean = true,
     val historyEnabled: Boolean = true,
     val historyRetentionDays: Int = 30,
-    val threatThreshold: Int = 3,
 ) {
     companion object {
         const val NO_PROFILE = 0L

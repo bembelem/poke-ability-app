@@ -22,7 +22,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
-import ru.fefu.pokeabilityapp.domain.model.TEAM_SIZE
 import ru.fefu.pokeabilityapp.domain.model.ThemeMode
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +30,6 @@ fun SettingsScreen(
     settings: AppSettings,
     onThemeChange: (ThemeMode) -> Unit,
     onCacheTtlChange: (Int) -> Unit,
-    onThreatThresholdChange: (Int) -> Unit,
     onHistoryEnabledChange: (Boolean) -> Unit
 ) {
     Scaffold(
@@ -71,25 +69,6 @@ fun SettingsScreen(
             )
             Text(
                 text = "Через столько список считается устаревшим и обновляется из сети",
-                style = MaterialTheme.typography.bodySmall
-            )
-
-            HorizontalDivider()
-
-            Text("Порог угрозы", style = MaterialTheme.typography.titleMedium)
-            Text(
-                text = "${settings.threatThreshold} из $TEAM_SIZE",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Slider(
-                value = settings.threatThreshold.toFloat(),
-                onValueChange = { onThreatThresholdChange(it.toInt()) },
-                valueRange = 1f..TEAM_SIZE.toFloat(),
-                steps = TEAM_SIZE - 2
-            )
-            Text(
-                text = "Сколько покемонов команды должны получать увеличенный урон " +
-                    "от типа, чтобы он попал в главные угрозы",
                 style = MaterialTheme.typography.bodySmall
             )
 

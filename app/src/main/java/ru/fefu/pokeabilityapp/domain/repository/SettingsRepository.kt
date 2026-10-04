@@ -14,5 +14,4 @@ interface SettingsRepository {
     suspend fun setPrefetchTeamsForOffline(enabled: Boolean)
     suspend fun setHistoryEnabled(enabled: Boolean)
     suspend fun setHistoryRetentionDays(days: Int)
-    suspend fun setThreatThreshold(value: Int)
 }
