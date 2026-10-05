@@ -12,11 +12,11 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.fefu.pokeabilityapp.FakeAbilityRepository
-import ru.fefu.pokeabilityapp.FakePokemonRepository
-import ru.fefu.pokeabilityapp.FakeTeamRepository
 import ru.fefu.pokeabilityapp.domain.model.Team
 import ru.fefu.pokeabilityapp.domain.model.TeamSlot
+import ru.fefu.pokeabilityapp.fake.FakeAbilityRepository
+import ru.fefu.pokeabilityapp.fake.FakePokemonRepository
+import ru.fefu.pokeabilityapp.fake.FakeTeamRepository
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)

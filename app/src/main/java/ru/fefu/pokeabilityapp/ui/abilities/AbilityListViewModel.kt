@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.ui.list
+package ru.fefu.pokeabilityapp.ui.abilities
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

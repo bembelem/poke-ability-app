@@ -20,6 +20,10 @@ import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.data.local.CachedAbilityEntity
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
+import ru.fefu.pokeabilityapp.fake.FakePokeApi
+import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
+import ru.fefu.pokeabilityapp.fake.abilityDto
+import ru.fefu.pokeabilityapp.fake.abilityListDto
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)

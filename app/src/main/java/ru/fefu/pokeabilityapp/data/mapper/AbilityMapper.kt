@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data
+package ru.fefu.pokeabilityapp.data.mapper
 
 import ru.fefu.pokeabilityapp.data.dto.AbilityDto
 import ru.fefu.pokeabilityapp.data.dto.AbilityEntryDto

@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.ui.detail
+package ru.fefu.pokeabilityapp.ui.abilities
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel

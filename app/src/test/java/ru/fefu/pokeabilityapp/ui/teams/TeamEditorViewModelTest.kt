@@ -13,8 +13,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import ru.fefu.pokeabilityapp.FakePokemonRepository
-import ru.fefu.pokeabilityapp.FakeTeamRepository
 import ru.fefu.pokeabilityapp.MainDispatcherRule
 import ru.fefu.pokeabilityapp.domain.model.PokeType
 import ru.fefu.pokeabilityapp.domain.model.PokeType.FIRE
@@ -27,6 +25,8 @@ import ru.fefu.pokeabilityapp.domain.model.PokemonDetail
 import ru.fefu.pokeabilityapp.domain.model.Team
 import ru.fefu.pokeabilityapp.domain.model.TeamSlot
 import ru.fefu.pokeabilityapp.domain.model.TypeChart
+import ru.fefu.pokeabilityapp.fake.FakePokemonRepository
+import ru.fefu.pokeabilityapp.fake.FakeTeamRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class TeamEditorViewModelTest {

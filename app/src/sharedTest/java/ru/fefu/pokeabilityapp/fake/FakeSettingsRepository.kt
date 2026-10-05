@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data.repository
+package ru.fefu.pokeabilityapp.fake
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow

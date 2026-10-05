@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data
+package ru.fefu.pokeabilityapp.data.mapper
 
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull

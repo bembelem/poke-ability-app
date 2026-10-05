@@ -9,9 +9,9 @@ import retrofit2.HttpException
 import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
 import ru.fefu.pokeabilityapp.data.local.toDetailOrNull
 import ru.fefu.pokeabilityapp.data.local.toItem
+import ru.fefu.pokeabilityapp.data.mapper.toCached
+import ru.fefu.pokeabilityapp.data.mapper.toCachedOrNull
 import ru.fefu.pokeabilityapp.data.service.PokeApiService
-import ru.fefu.pokeabilityapp.data.toCached
-import ru.fefu.pokeabilityapp.data.toCachedOrNull
 import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.model.hoursToMillis

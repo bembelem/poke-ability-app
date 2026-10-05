@@ -14,6 +14,11 @@ import org.junit.runner.RunWith
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 import ru.fefu.pokeabilityapp.domain.model.PokeType
+import ru.fefu.pokeabilityapp.fake.FakePokeApi
+import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
+import ru.fefu.pokeabilityapp.fake.pokemonDto
+import ru.fefu.pokeabilityapp.fake.pokemonListDto
+import ru.fefu.pokeabilityapp.fake.typeDto
 
 @RunWith(AndroidJUnit4::class)
 class PokemonRepositoryImplTest {

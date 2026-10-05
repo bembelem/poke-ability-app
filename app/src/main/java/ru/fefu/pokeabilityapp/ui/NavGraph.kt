@@ -22,11 +22,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.navArgument
-import ru.fefu.pokeabilityapp.ui.detail.AbilityDetailScreen
+import ru.fefu.pokeabilityapp.ui.abilities.AbilityDetailScreen
+import ru.fefu.pokeabilityapp.ui.abilities.AbilityListScreen
+import ru.fefu.pokeabilityapp.ui.abilities.AbilityListViewModel
 import ru.fefu.pokeabilityapp.ui.history.HistoryScreen
 import ru.fefu.pokeabilityapp.ui.history.HistoryViewModel
-import ru.fefu.pokeabilityapp.ui.list.AbilityListScreen
-import ru.fefu.pokeabilityapp.ui.list.AbilityListViewModel
 import ru.fefu.pokeabilityapp.ui.profiles.ProfilesScreen
 import ru.fefu.pokeabilityapp.ui.profiles.ProfilesViewModel
 import ru.fefu.pokeabilityapp.ui.settings.SettingsScreen

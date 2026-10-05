@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data.repository
+package ru.fefu.pokeabilityapp.fake
 
 import ru.fefu.pokeabilityapp.data.dto.AbilityDto
 import ru.fefu.pokeabilityapp.data.dto.AbilityEntryDto

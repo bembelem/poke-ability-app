@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.ui.list
+package ru.fefu.pokeabilityapp.ui.abilities
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -13,11 +13,11 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-import ru.fefu.pokeabilityapp.FakeAbilityRepository
-import ru.fefu.pokeabilityapp.FakeFavouriteRepository
 import ru.fefu.pokeabilityapp.MainDispatcherRule
 import ru.fefu.pokeabilityapp.domain.model.AbilityFilter
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
+import ru.fefu.pokeabilityapp.fake.FakeAbilityRepository
+import ru.fefu.pokeabilityapp.fake.FakeFavouriteRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class AbilityListViewModelTest {

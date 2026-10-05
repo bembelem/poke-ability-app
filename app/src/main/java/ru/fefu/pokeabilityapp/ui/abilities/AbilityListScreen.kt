@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.ui.list
+package ru.fefu.pokeabilityapp.ui.abilities
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

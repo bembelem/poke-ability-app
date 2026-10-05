@@ -16,6 +16,7 @@ import ru.fefu.pokeabilityapp.data.local.AppDatabase
 import ru.fefu.pokeabilityapp.data.local.HistoryEntryEntity
 import ru.fefu.pokeabilityapp.data.local.ProfileEntity
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
+import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
 
 @RunWith(AndroidJUnit4::class)
 class HistoryRepositoryImplTest {

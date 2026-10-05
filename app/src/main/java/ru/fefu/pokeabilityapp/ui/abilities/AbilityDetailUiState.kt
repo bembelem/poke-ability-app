@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.ui.detail
+package ru.fefu.pokeabilityapp.ui.abilities
 
 import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 

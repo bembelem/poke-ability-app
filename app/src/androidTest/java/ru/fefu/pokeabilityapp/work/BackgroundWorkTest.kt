@@ -13,7 +13,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import ru.fefu.pokeabilityapp.data.repository.FakeSettingsRepository
+import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
 
 @RunWith(AndroidJUnit4::class)
 class BackgroundWorkTest {

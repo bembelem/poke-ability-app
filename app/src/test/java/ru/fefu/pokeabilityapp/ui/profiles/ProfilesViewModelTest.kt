@@ -9,11 +9,11 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
-import ru.fefu.pokeabilityapp.FakeProfileRepository
 import ru.fefu.pokeabilityapp.MainDispatcherRule
-import ru.fefu.pokeabilityapp.data.repository.FakeSettingsRepository
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 import ru.fefu.pokeabilityapp.domain.model.Profile
+import ru.fefu.pokeabilityapp.fake.FakeProfileRepository
+import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProfilesViewModelTest {
