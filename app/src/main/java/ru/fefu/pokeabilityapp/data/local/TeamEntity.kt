@@ -21,7 +21,6 @@ data class TeamEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val profileId: Long,
     val name: String,
-    val note: String = "",
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long = System.currentTimeMillis()
 )

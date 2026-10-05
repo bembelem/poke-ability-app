@@ -178,3 +178,55 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         )
     }
 }
+
+// теги, заметки и прозвища убраны: в SQLite колонку удаляет только пересборка таблицы
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE IF EXISTS `slot_tags`")
+        db.execSQL("DROP TABLE IF EXISTS `tags`")
+
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `teams_new` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`profileId` INTEGER NOT NULL, " +
+                "`name` TEXT NOT NULL, " +
+                "`createdAt` INTEGER NOT NULL, " +
+                "`updatedAt` INTEGER NOT NULL, " +
+                "FOREIGN KEY(`profileId`) REFERENCES `profiles`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL(
+            "INSERT INTO teams_new (id, profileId, name, createdAt, updatedAt) " +
+                "SELECT id, profileId, name, createdAt, updatedAt FROM teams"
+        )
+        db.execSQL("DROP TABLE teams")
+        db.execSQL("ALTER TABLE teams_new RENAME TO teams")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_teams_profileId` ON `teams` (`profileId`)")
+
+        db.execSQL(
+            "CREATE TABLE IF NOT EXISTS `team_slots_new` (" +
+                "`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                "`teamId` INTEGER NOT NULL, " +
+                "`position` INTEGER NOT NULL, " +
+                "`pokemonId` INTEGER NOT NULL, " +
+                "`pokemonName` TEXT NOT NULL, " +
+                "`abilityId` INTEGER, " +
+                "`abilityName` TEXT, " +
+                "FOREIGN KEY(`teamId`) REFERENCES `teams`(`id`) " +
+                "ON UPDATE NO ACTION ON DELETE CASCADE )"
+        )
+        db.execSQL(
+            "INSERT INTO team_slots_new " +
+                "(id, teamId, position, pokemonId, pokemonName, abilityId, abilityName) " +
+                "SELECT id, teamId, position, pokemonId, pokemonName, abilityId, abilityName " +
+                "FROM team_slots"
+        )
+        db.execSQL("DROP TABLE team_slots")
+        db.execSQL("ALTER TABLE team_slots_new RENAME TO team_slots")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_team_slots_teamId` ON `team_slots` (`teamId`)")
+        db.execSQL(
+            "CREATE UNIQUE INDEX IF NOT EXISTS `index_team_slots_teamId_position` " +
+                "ON `team_slots` (`teamId`, `position`)"
+        )
+    }
+}

@@ -19,7 +19,6 @@ data class TeamWithSlots(
 fun TeamWithSlots.toDomain(): Team = Team(
     id = team.id,
     name = team.name,
-    note = team.note,
     slots = slots.sortedBy { it.position }.map { it.toDomain() }
 )
 
@@ -40,9 +39,6 @@ interface TeamDao {
 
     @Insert
     suspend fun insertTeam(team: TeamEntity): Long
-
-    @Query("UPDATE teams SET name = :name, note = :note, updatedAt = :updatedAt WHERE id = :id")
-    suspend fun updateTeam(id: Long, name: String, note: String, updatedAt: Long)
 
     @Query("UPDATE teams SET updatedAt = :updatedAt WHERE id = :id")
     suspend fun touchTeam(id: Long, updatedAt: Long)

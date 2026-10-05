@@ -30,9 +30,7 @@ class WorkersTest {
         pokemonId = pokemonId,
         pokemonName = "pokemon-$pokemonId",
         abilityId = null,
-        abilityName = null,
-        nickname = null,
-        note = null
+        abilityName = null
     )
 
     private fun prefetchWorker(
@@ -55,7 +53,6 @@ class WorkersTest {
         Team(
             id = 1,
             name = "main",
-            note = "",
             slots = pokemonIds.mapIndexed { index, id -> slot(index.toLong(), index, id) }
         )
     )

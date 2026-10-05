@@ -40,11 +40,6 @@ class TeamRepositoryImpl @Inject constructor(
         dao.insertTeam(TeamEntity(profileId = profileId, name = name))
     }
 
-    override suspend fun updateTeam(id: Long, name: String, note: String) =
-        withContext(Dispatchers.IO) {
-            dao.updateTeam(id, name, note, System.currentTimeMillis())
-        }
-
     override suspend fun deleteTeam(id: Long) = withContext(Dispatchers.IO) {
         dao.deleteTeam(id)
     }
@@ -86,13 +81,6 @@ class TeamRepositoryImpl @Inject constructor(
         withContext(Dispatchers.IO) {
             val slot = dao.getSlot(slotId) ?: return@withContext
             dao.updateSlot(slot.copy(abilityId = abilityId, abilityName = abilityName))
-            dao.touchTeam(slot.teamId, System.currentTimeMillis())
-        }
-
-    override suspend fun setSlotDetails(slotId: Long, nickname: String?, note: String?) =
-        withContext(Dispatchers.IO) {
-            val slot = dao.getSlot(slotId) ?: return@withContext
-            dao.updateSlot(slot.copy(nickname = nickname, note = note))
             dao.touchTeam(slot.teamId, System.currentTimeMillis())
         }
 

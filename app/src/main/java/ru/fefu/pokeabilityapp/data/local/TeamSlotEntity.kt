@@ -28,9 +28,7 @@ data class TeamSlotEntity(
     val pokemonId: Int,
     val pokemonName: String,
     val abilityId: Int? = null,
-    val abilityName: String? = null,
-    val nickname: String? = null,
-    val note: String? = null
+    val abilityName: String? = null
 )
 
 fun TeamSlotEntity.toDomain(): TeamSlot = TeamSlot(
@@ -39,7 +37,5 @@ fun TeamSlotEntity.toDomain(): TeamSlot = TeamSlot(
     pokemonId = pokemonId,
     pokemonName = pokemonName,
     abilityId = abilityId,
-    abilityName = abilityName,
-    nickname = nickname,
-    note = note
+    abilityName = abilityName
 )

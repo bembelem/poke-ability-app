@@ -18,10 +18,6 @@ class FakeTeamRepository(initial: Team) : TeamRepository {
 
     override suspend fun createTeam(name: String): Long = error("not used in tests")
 
-    override suspend fun updateTeam(id: Long, name: String, note: String) {
-        team.update { it?.copy(name = name, note = note) }
-    }
-
     override suspend fun deleteTeam(id: Long) {
         team.value = null
     }
@@ -35,10 +31,6 @@ class FakeTeamRepository(initial: Team) : TeamRepository {
 
     override suspend fun setSlotAbility(slotId: Long, abilityId: Int?, abilityName: String?) {
         updateSlot(slotId) { it.copy(abilityId = abilityId, abilityName = abilityName) }
-    }
-
-    override suspend fun setSlotDetails(slotId: Long, nickname: String?, note: String?) {
-        updateSlot(slotId) { it.copy(nickname = nickname, note = note) }
     }
 
     override suspend fun clearSlot(teamId: Long, position: Int) {

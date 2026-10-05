@@ -122,21 +122,55 @@ class MigrationTest {
     }
 
     @Test
-    fun fullChain1To7_keepsFavourites() {
+    fun migration7To8_keepsTeamsAndDropsTags() {
+        val oldDb = helper.createDatabase(dbName, 7)
+        oldDb.execSQL("INSERT INTO profiles (id, name, createdAt) VALUES (1, 'Ash', 1)")
+        oldDb.execSQL(
+            "INSERT INTO teams (id, profileId, name, note, createdAt, updatedAt) " +
+                "VALUES (1, 1, 'main', 'note', 1, 1)"
+        )
+        oldDb.execSQL(
+            "INSERT INTO team_slots " +
+                "(id, teamId, position, pokemonId, pokemonName, abilityId, abilityName, nickname, note) " +
+                "VALUES (1, 1, 0, 6, 'charizard', 66, 'blaze', 'Zard', 'lead')"
+        )
+        oldDb.execSQL("INSERT INTO tags (id, profileId, name, colorArgb) VALUES (1, 1, 'lead', 0)")
+        oldDb.execSQL("INSERT INTO slot_tags (slotId, tagId) VALUES (1, 1)")
+        oldDb.close()
+
+        val db = helper.runMigrationsAndValidate(dbName, 8, true, MIGRATION_7_8)
+
+        db.query("SELECT name FROM teams").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("main", cursor.getString(0))
+        }
+        db.query("SELECT pokemonName, abilityName FROM team_slots").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("charizard", cursor.getString(0))
+            assertEquals("blaze", cursor.getString(1))
+        }
+        db.query("SELECT name FROM sqlite_master WHERE name IN ('tags', 'slot_tags')").use { cursor ->
+            assertEquals(0, cursor.count)
+        }
+    }
+
+    @Test
+    fun fullChain1To8_keepsFavourites() {
         val oldDb = helper.createDatabase(dbName, 1)
         oldDb.execSQL("INSERT INTO favourites (id, name, addedAt) VALUES (1, 'overgrow', 100)")
         oldDb.close()
 
         val db = helper.runMigrationsAndValidate(
             dbName,
-            7,
+            8,
             true,
             MIGRATION_1_2,
             MIGRATION_2_3,
             MIGRATION_3_4,
             MIGRATION_4_5,
             MIGRATION_5_6,
-            MIGRATION_6_7
+            MIGRATION_6_7,
+            MIGRATION_7_8
         )
 
         db.query("SELECT name FROM favourites").use { cursor ->

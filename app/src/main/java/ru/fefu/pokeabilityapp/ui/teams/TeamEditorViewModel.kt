@@ -123,7 +123,7 @@ class TeamEditorViewModel @Inject constructor(
             if (detail.types.isEmpty()) return@mapNotNull null
             TeamMember(
                 slotId = slot.id,
-                pokemonName = slot.nickname ?: detail.name,
+                pokemonName = detail.name,
                 types = detail.types,
                 abilityName = slot.abilityName
             )

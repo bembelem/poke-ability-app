@@ -9,21 +9,18 @@ import androidx.room.RoomDatabase
         ProfileEntity::class,
         TeamEntity::class,
         TeamSlotEntity::class,
-        TagEntity::class,
-        SlotTagCrossRef::class,
         CachedAbilityEntity::class,
         HistoryEntryEntity::class,
         CachedPokemonEntity::class,
         PokemonAbilityEntity::class,
         TypeEffectivenessEntity::class
     ],
-    version = 7
+    version = 8
 )
 abstract class AppDatabase : RoomDatabase() {
     abstract fun getFavouriteDao(): FavouriteDao
     abstract fun getProfileDao(): ProfileDao
     abstract fun getTeamDao(): TeamDao
-    abstract fun getTagDao(): TagDao
     abstract fun getAbilityCacheDao(): AbilityCacheDao
     abstract fun getHistoryDao(): HistoryDao
     abstract fun getPokemonCacheDao(): PokemonCacheDao

@@ -40,12 +40,10 @@ class TeamEditorViewModelTest {
         pokemonId = pokemonId,
         pokemonName = name,
         abilityId = null,
-        abilityName = null,
-        nickname = null,
-        note = null
+        abilityName = null
     )
 
-    private fun team(vararg slots: TeamSlot) = Team(id = 1, name = "main", note = "", slots = slots.toList())
+    private fun team(vararg slots: TeamSlot) = Team(id = 1, name = "main", slots = slots.toList())
 
     private fun detail(id: Int, name: String, vararg types: PokeType) =
         PokemonDetail(id, name, spriteUrl = null, types = types.toList(), abilities = emptyList())
@@ -142,10 +140,10 @@ class TeamEditorViewModelTest {
     fun `details are requested once per pokemon`() = runTest {
         val teams = FakeTeamRepository(team(slot(10, 0, 6, "charizard")))
         val pokemon = FakePokemonRepository()
-        createViewModel(teams, pokemon)
+        val viewModel = createViewModel(teams, pokemon)
         advanceUntilIdle()
 
-        teams.updateTeam(1, "renamed", "")
+        viewModel.selectAbility(10, PokemonAbilityOption(66, "blaze", isHidden = false))
         advanceUntilIdle()
 
         assertEquals(listOf(6), pokemon.ensureDetailCalls)
