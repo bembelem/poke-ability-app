@@ -24,10 +24,6 @@ class FakeProfileRepository(
         return id
     }
 
-    override suspend fun renameProfile(id: Long, name: String) {
-        profiles.update { list -> list.map { if (it.id == id) it.copy(name = name) else it } }
-    }
-
     override suspend fun deleteProfile(id: Long) {
         profiles.update { list -> list.filterNot { it.id == id } }
     }

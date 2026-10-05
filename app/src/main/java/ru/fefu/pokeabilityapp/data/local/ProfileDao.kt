@@ -19,9 +19,6 @@ interface ProfileDao {
     @Insert
     suspend fun insert(entity: ProfileEntity): Long
 
-    @Query("UPDATE profiles SET name = :name WHERE id = :id")
-    suspend fun rename(id: Long, name: String)
-
     @Query("DELETE FROM profiles WHERE id = :id")
     suspend fun deleteById(id: Long)
 }

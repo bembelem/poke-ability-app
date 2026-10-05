@@ -52,15 +52,6 @@ class ProfileDaoTest {
     }
 
     @Test
-    fun rename_updatesName() = runTest {
-        val id = dao.insert(ProfileEntity(name = "Ash", createdAt = 100))
-
-        dao.rename(id, "Gary")
-
-        assertEquals("Gary", dao.getById(id)?.name)
-    }
-
-    @Test
     fun deleteById_removesProfile() = runTest {
         val id = dao.insert(ProfileEntity(name = "Ash", createdAt = 100))
 

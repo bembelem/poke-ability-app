@@ -25,10 +25,6 @@ class ProfileRepositoryImpl @Inject constructor(
         dao.insert(ProfileEntity(name = name))
     }
 
-    override suspend fun renameProfile(id: Long, name: String) = withContext(Dispatchers.IO) {
-        dao.rename(id, name)
-    }
-
     override suspend fun deleteProfile(id: Long) = withContext(Dispatchers.IO) {
         dao.deleteById(id)
     }
