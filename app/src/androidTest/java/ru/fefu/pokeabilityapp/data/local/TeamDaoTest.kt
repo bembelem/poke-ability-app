@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteConstraintException
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -57,7 +58,7 @@ class TeamDaoTest {
         dao.insertSlot(slot(teamId, position = 2, pokemonId = 25, name = "pikachu"))
         dao.insertSlot(slot(teamId, position = 0, pokemonId = 6, name = "charizard"))
 
-        val team = dao.getTeams(ash).single().toDomain()
+        val team = dao.observeTeams(ash).first().single().toDomain()
 
         assertEquals(listOf("charizard", "pikachu"), team.slots.map { it.pokemonName })
     }
@@ -67,8 +68,8 @@ class TeamDaoTest {
         createTeam(ash, "ash team")
         createTeam(gary, "gary team")
 
-        assertEquals(listOf("ash team"), dao.getTeams(ash).map { it.team.name })
-        assertEquals(listOf("gary team"), dao.getTeams(gary).map { it.team.name })
+        assertEquals(listOf("ash team"), dao.observeTeams(ash).first().map { it.team.name })
+        assertEquals(listOf("gary team"), dao.observeTeams(gary).first().map { it.team.name })
     }
 
     @Test
@@ -79,7 +80,7 @@ class TeamDaoTest {
         dao.deleteTeam(teamId)
 
         assertNull(dao.getSlotAt(teamId, 0))
-        assertEquals(emptyList<TeamWithSlots>(), dao.getTeams(ash))
+        assertEquals(emptyList<TeamWithSlots>(), dao.observeTeams(ash).first())
     }
 
     @Test
@@ -89,7 +90,7 @@ class TeamDaoTest {
 
         database.getProfileDao().deleteById(ash)
 
-        assertEquals(emptyList<TeamWithSlots>(), dao.getTeams(ash))
+        assertEquals(emptyList<TeamWithSlots>(), dao.observeTeams(ash).first())
         assertNull(dao.getSlotAt(teamId, 0))
     }
 
@@ -122,7 +123,7 @@ class TeamDaoTest {
 
         dao.deleteSlotAt(teamId, 0)
 
-        val names = dao.getTeams(ash).single().toDomain().slots.map { it.pokemonName }
+        val names = dao.observeTeams(ash).first().single().toDomain().slots.map { it.pokemonName }
         assertEquals(listOf("charizard"), names)
     }
 }

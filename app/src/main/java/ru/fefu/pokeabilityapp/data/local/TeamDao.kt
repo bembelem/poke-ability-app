@@ -33,10 +33,6 @@ interface TeamDao {
     @Query("SELECT * FROM teams WHERE id = :teamId")
     fun observeTeam(teamId: Long): Flow<TeamWithSlots?>
 
-    @Transaction
-    @Query("SELECT * FROM teams WHERE profileId = :profileId ORDER BY updatedAt DESC")
-    suspend fun getTeams(profileId: Long): List<TeamWithSlots>
-
     @Insert
     suspend fun insertTeam(team: TeamEntity): Long
 
