@@ -7,4 +7,7 @@ interface HistoryRepository {
     fun observeRecent(): Flow<List<HistoryEntry>>
     suspend fun record(abilityId: Int, abilityName: String)
     suspend fun clear()
+
+    /** Удаляет у каждого профиля записи старше его срока хранения. */
+    suspend fun deleteExpired(now: Long)
 }

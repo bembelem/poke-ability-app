@@ -49,4 +49,16 @@ class SettingsViewModel @Inject constructor(
     fun setHistoryEnabled(enabled: Boolean) {
         viewModelScope.launch { repository.setHistoryEnabled(enabled) }
     }
+
+    fun setAutoRefreshEnabled(enabled: Boolean) {
+        viewModelScope.launch { repository.setAutoRefreshEnabled(enabled) }
+    }
+
+    fun setRefreshOnWifiOnly(enabled: Boolean) {
+        viewModelScope.launch { repository.setRefreshOnWifiOnly(enabled) }
+    }
+
+    fun setHistoryRetentionDays(days: Int) {
+        viewModelScope.launch { repository.setHistoryRetentionDays(days) }
+    }
 }

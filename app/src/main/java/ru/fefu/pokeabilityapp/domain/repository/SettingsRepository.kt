@@ -6,12 +6,15 @@ import ru.fefu.pokeabilityapp.domain.model.ThemeMode
 
 interface SettingsRepository {
     fun observeSettings(): Flow<AppSettings>
+
+    /** Настройки конкретного профиля, не обязательно активного. */
+    suspend fun settingsFor(profileId: Long): AppSettings
+
     suspend fun setActiveProfile(id: Long)
     suspend fun setThemeMode(mode: ThemeMode)
     suspend fun setCacheTtlHours(hours: Int)
     suspend fun setAutoRefreshEnabled(enabled: Boolean)
     suspend fun setRefreshOnWifiOnly(enabled: Boolean)
-    suspend fun setPrefetchTeamsForOffline(enabled: Boolean)
     suspend fun setHistoryEnabled(enabled: Boolean)
     suspend fun setHistoryRetentionDays(days: Int)
 }

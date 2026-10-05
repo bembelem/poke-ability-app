@@ -22,6 +22,8 @@ class FakeAbilityRepository : AbilityRepository {
     var failSearch = false
     var failDetail = false
 
+    var lastRefreshForce: Boolean? = null
+        private set
     var refreshCalls = 0
         private set
 
@@ -35,6 +37,7 @@ class FakeAbilityRepository : AbilityRepository {
 
     override suspend fun refreshFirstPage(force: Boolean) {
         refreshCalls++
+        lastRefreshForce = force
         if (failRefresh) error("refresh failed")
         cached.value = refreshResult
     }

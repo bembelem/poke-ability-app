@@ -190,7 +190,10 @@ fun NavGraph(navController: NavHostController) {
                     onProfilesClick = { navController.navigate(Screen.Profiles.route) },
                     onThemeChange = { viewModel.setThemeMode(it) },
                     onCacheTtlChange = { viewModel.setCacheTtlHours(it) },
-                    onHistoryEnabledChange = { viewModel.setHistoryEnabled(it) }
+                    onAutoRefreshChange = { viewModel.setAutoRefreshEnabled(it) },
+                    onWifiOnlyChange = { viewModel.setRefreshOnWifiOnly(it) },
+                    onHistoryEnabledChange = { viewModel.setHistoryEnabled(it) },
+                    onHistoryRetentionChange = { viewModel.setHistoryRetentionDays(it) }
                 )
             }
             composable(

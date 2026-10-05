@@ -8,7 +8,6 @@ data class AppSettings(
     val cacheTtlHours: Int = 24,
     val autoRefreshEnabled: Boolean = true,
     val refreshOnWifiOnly: Boolean = false,
-    val prefetchTeamsForOffline: Boolean = true,
     val historyEnabled: Boolean = true,
     val historyRetentionDays: Int = 30,
 ) {

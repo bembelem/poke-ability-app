@@ -33,7 +33,10 @@ fun SettingsScreen(
     onProfilesClick: () -> Unit,
     onThemeChange: (ThemeMode) -> Unit,
     onCacheTtlChange: (Int) -> Unit,
-    onHistoryEnabledChange: (Boolean) -> Unit
+    onAutoRefreshChange: (Boolean) -> Unit,
+    onWifiOnlyChange: (Boolean) -> Unit,
+    onHistoryEnabledChange: (Boolean) -> Unit,
+    onHistoryRetentionChange: (Int) -> Unit
 ) {
     Scaffold(
         topBar = { TopAppBar(title = { Text("Настройки") }) }
@@ -91,18 +94,58 @@ fun SettingsScreen(
 
             HorizontalDivider()
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text("Вести историю просмотров", style = MaterialTheme.typography.titleMedium)
-                Switch(
-                    checked = settings.historyEnabled,
-                    onCheckedChange = onHistoryEnabledChange
-                )
-            }
+            SwitchRow(
+                title = "Обновлять в фоне",
+                checked = settings.autoRefreshEnabled,
+                onCheckedChange = onAutoRefreshChange
+            )
+            SwitchRow(
+                title = "Только по Wi-Fi",
+                checked = settings.refreshOnWifiOnly,
+                enabled = settings.autoRefreshEnabled,
+                onCheckedChange = onWifiOnlyChange
+            )
+            Text(
+                text = "Раз в несколько часов приложение обновляет устаревшие данные, " +
+                    "даже когда закрыто",
+                style = MaterialTheme.typography.bodySmall
+            )
+
+            HorizontalDivider()
+
+            SwitchRow(
+                title = "Вести историю просмотров",
+                checked = settings.historyEnabled,
+                onCheckedChange = onHistoryEnabledChange
+            )
+            Text(
+                text = "Хранить историю: ${settings.historyRetentionDays} дн.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+            Slider(
+                value = settings.historyRetentionDays.toFloat(),
+                onValueChange = { onHistoryRetentionChange(it.toInt()) },
+                valueRange = 1f..90f,
+                steps = 88
+            )
         }
+    }
+}
+
+@Composable
+private fun SwitchRow(
+    title: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(title, style = MaterialTheme.typography.titleMedium)
+        Switch(checked = checked, onCheckedChange = onCheckedChange, enabled = enabled)
     }
 }
 

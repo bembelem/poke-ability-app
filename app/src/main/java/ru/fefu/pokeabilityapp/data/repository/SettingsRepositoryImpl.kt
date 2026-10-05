@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 import ru.fefu.pokeabilityapp.domain.model.ThemeMode
@@ -29,31 +30,17 @@ class SettingsRepositoryImpl @Inject constructor(
             booleanPreferencesKey("p${profileId}_auto_refresh_enabled")
         fun refreshOnWifiOnly(profileId: Long) =
             booleanPreferencesKey("p${profileId}_refresh_on_wifi_only")
-        fun prefetchTeamsForOffline(profileId: Long) =
-            booleanPreferencesKey("p${profileId}_prefetch_teams_for_offline")
         fun historyEnabled(profileId: Long) = booleanPreferencesKey("p${profileId}_history_enabled")
         fun historyRetentionDays(profileId: Long) =
             intPreferencesKey("p${profileId}_history_retention_days")
     }
 
     override fun observeSettings(): Flow<AppSettings> = dataStore.data.map { prefs ->
-        val defaults = AppSettings()
-        val profileId = activeProfile(prefs)
-        AppSettings(
-            activeProfileId = profileId,
-            themeMode = readThemeMode(prefs[Keys.themeMode(profileId)]),
-            cacheTtlHours = prefs[Keys.cacheTtlHours(profileId)] ?: defaults.cacheTtlHours,
-            autoRefreshEnabled = prefs[Keys.autoRefreshEnabled(profileId)]
-                ?: defaults.autoRefreshEnabled,
-            refreshOnWifiOnly = prefs[Keys.refreshOnWifiOnly(profileId)]
-                ?: defaults.refreshOnWifiOnly,
-            prefetchTeamsForOffline = prefs[Keys.prefetchTeamsForOffline(profileId)]
-                ?: defaults.prefetchTeamsForOffline,
-            historyEnabled = prefs[Keys.historyEnabled(profileId)] ?: defaults.historyEnabled,
-            historyRetentionDays = prefs[Keys.historyRetentionDays(profileId)]
-                ?: defaults.historyRetentionDays,
-        )
+        read(prefs, activeProfile(prefs))
     }
+
+    override suspend fun settingsFor(profileId: Long): AppSettings =
+        read(dataStore.data.first(), profileId)
 
     override suspend fun setActiveProfile(id: Long) {
         dataStore.edit { it[Keys.activeProfileId] = id }
@@ -75,16 +62,28 @@ class SettingsRepositoryImpl @Inject constructor(
         prefs[Keys.refreshOnWifiOnly(profileId)] = enabled
     }
 
-    override suspend fun setPrefetchTeamsForOffline(enabled: Boolean) = update { prefs, profileId ->
-        prefs[Keys.prefetchTeamsForOffline(profileId)] = enabled
-    }
-
     override suspend fun setHistoryEnabled(enabled: Boolean) = update { prefs, profileId ->
         prefs[Keys.historyEnabled(profileId)] = enabled
     }
 
     override suspend fun setHistoryRetentionDays(days: Int) = update { prefs, profileId ->
         prefs[Keys.historyRetentionDays(profileId)] = days.coerceAtLeast(1)
+    }
+
+    private fun read(prefs: Preferences, profileId: Long): AppSettings {
+        val defaults = AppSettings()
+        return AppSettings(
+            activeProfileId = activeProfile(prefs),
+            themeMode = readThemeMode(prefs[Keys.themeMode(profileId)]),
+            cacheTtlHours = prefs[Keys.cacheTtlHours(profileId)] ?: defaults.cacheTtlHours,
+            autoRefreshEnabled = prefs[Keys.autoRefreshEnabled(profileId)]
+                ?: defaults.autoRefreshEnabled,
+            refreshOnWifiOnly = prefs[Keys.refreshOnWifiOnly(profileId)]
+                ?: defaults.refreshOnWifiOnly,
+            historyEnabled = prefs[Keys.historyEnabled(profileId)] ?: defaults.historyEnabled,
+            historyRetentionDays = prefs[Keys.historyRetentionDays(profileId)]
+                ?: defaults.historyRetentionDays,
+        )
     }
 
     private suspend fun update(block: (MutablePreferences, Long) -> Unit) {

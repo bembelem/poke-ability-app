@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import ru.fefu.pokeabilityapp.domain.model.PokemonItem
 import ru.fefu.pokeabilityapp.domain.repository.PokemonRepository
 import ru.fefu.pokeabilityapp.domain.repository.TeamRepository
+import ru.fefu.pokeabilityapp.work.BackgroundWork
 import javax.inject.Inject
 
 data class PokemonPickerUiState(
@@ -28,6 +29,7 @@ data class PokemonPickerUiState(
 class PokemonPickerViewModel @Inject constructor(
     private val pokemonRepository: PokemonRepository,
     private val teamRepository: TeamRepository,
+    private val backgroundWork: BackgroundWork,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -98,10 +100,11 @@ class PokemonPickerViewModel @Inject constructor(
         }
     }
 
-    // типы и способности догружает редактор команды, здесь только сохраняем слот
+    // если сети нет, предзагрузка дождётся её и догрузит типы и способности в фоне
     fun pick(item: PokemonItem, onDone: () -> Unit) {
         viewModelScope.launch {
             teamRepository.setSlot(teamId, position, item.id, item.name)
+            backgroundWork.requestTeamPrefetch()
             onDone()
         }
     }

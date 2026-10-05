@@ -13,6 +13,9 @@ class FakeSettingsRepository(initial: AppSettings = AppSettings()) : SettingsRep
 
     override fun observeSettings(): Flow<AppSettings> = state.asStateFlow()
 
+    // в фейке у всех профилей одни настройки
+    override suspend fun settingsFor(profileId: Long): AppSettings = state.value
+
     override suspend fun setActiveProfile(id: Long) {
         state.value = state.value.copy(activeProfileId = id)
     }
@@ -31,10 +34,6 @@ class FakeSettingsRepository(initial: AppSettings = AppSettings()) : SettingsRep
 
     override suspend fun setRefreshOnWifiOnly(enabled: Boolean) {
         state.value = state.value.copy(refreshOnWifiOnly = enabled)
-    }
-
-    override suspend fun setPrefetchTeamsForOffline(enabled: Boolean) {
-        state.value = state.value.copy(prefetchTeamsForOffline = enabled)
     }
 
     override suspend fun setHistoryEnabled(enabled: Boolean) {

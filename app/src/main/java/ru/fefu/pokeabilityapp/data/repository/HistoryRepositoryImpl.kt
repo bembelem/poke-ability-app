@@ -51,4 +51,15 @@ class HistoryRepositoryImpl @Inject constructor(
     override suspend fun clear() = withContext(Dispatchers.IO) {
         dao.clear(profileRepository.ensureActiveProfile())
     }
+
+    override suspend fun deleteExpired(now: Long) = withContext(Dispatchers.IO) {
+        profileRepository.observeProfiles().first().forEach { profile ->
+            val days = settingsRepository.settingsFor(profile.id).historyRetentionDays
+            dao.deleteOlderThan(profile.id, now - days * DAY_MILLIS)
+        }
+    }
+
+    private companion object {
+        const val DAY_MILLIS = 24L * 60 * 60 * 1000
+    }
 }

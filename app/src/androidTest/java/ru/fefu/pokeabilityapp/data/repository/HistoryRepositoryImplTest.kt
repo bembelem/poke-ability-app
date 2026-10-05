@@ -13,6 +13,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
+import ru.fefu.pokeabilityapp.data.local.HistoryEntryEntity
 import ru.fefu.pokeabilityapp.data.local.ProfileEntity
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 
@@ -94,6 +95,28 @@ class HistoryRepositoryImplTest {
         repository.clear()
 
         assertTrue(repository.observeRecent().first().isEmpty())
+    }
+
+    @Test
+    fun deleteExpired_removesOnlyEntriesOlderThanRetention() = runTest {
+        val settings = FakeSettingsRepository(AppSettings(historyRetentionDays = 7))
+        val repository = repository(settings)
+        repository.record(1, "fresh")
+        val profileId = settings.observeSettings().first().activeProfileId
+        val now = System.currentTimeMillis()
+        val eightDaysAgo = now - 8L * 24 * 60 * 60 * 1000
+        database.getHistoryDao().insert(
+            HistoryEntryEntity(
+                profileId = profileId,
+                abilityId = 2,
+                abilityName = "old",
+                viewedAt = eightDaysAgo
+            )
+        )
+
+        repository.deleteExpired(now)
+
+        assertEquals(listOf("fresh"), repository.observeRecent().first().map { it.abilityName })
     }
 
     @Test

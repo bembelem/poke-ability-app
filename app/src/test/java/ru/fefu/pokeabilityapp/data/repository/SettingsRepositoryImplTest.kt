@@ -75,6 +75,17 @@ class SettingsRepositoryImplTest {
     }
 
     @Test
+    fun `settingsFor reads another profile without switching`() = runBlocking {
+        val repository = SettingsRepositoryImpl(createDataStore())
+        repository.setActiveProfile(2)
+        repository.setHistoryRetentionDays(5)
+        repository.setActiveProfile(1)
+
+        assertEquals(5, repository.settingsFor(2).historyRetentionDays)
+        assertEquals(1L, repository.observeSettings().first().activeProfileId)
+    }
+
+    @Test
     fun `each profile keeps its own settings`() = runBlocking {
         val repository = SettingsRepositoryImpl(createDataStore())
 

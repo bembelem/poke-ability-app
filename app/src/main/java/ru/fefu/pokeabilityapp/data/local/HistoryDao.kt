@@ -22,4 +22,7 @@ interface HistoryDao {
 
     @Query("DELETE FROM history_entries WHERE profileId = :profileId")
     suspend fun clear(profileId: Long)
+
+    @Query("DELETE FROM history_entries WHERE profileId = :profileId AND viewedAt < :before")
+    suspend fun deleteOlderThan(profileId: Long, before: Long)
 }
