@@ -1,9 +1,10 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import kotlinx.coroutines.flow.Flow
+import ru.fefu.pokeabilityapp.data.local.entity.HistoryEntryEntity
 
 @Dao
 interface HistoryDao {

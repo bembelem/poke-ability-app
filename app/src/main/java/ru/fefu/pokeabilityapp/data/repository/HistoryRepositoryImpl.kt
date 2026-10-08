@@ -8,9 +8,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import ru.fefu.pokeabilityapp.data.local.HistoryDao
-import ru.fefu.pokeabilityapp.data.local.HistoryEntryEntity
-import ru.fefu.pokeabilityapp.data.local.toDomain
+import ru.fefu.pokeabilityapp.data.local.dao.HistoryDao
+import ru.fefu.pokeabilityapp.data.local.entity.HistoryEntryEntity
+import ru.fefu.pokeabilityapp.data.local.entity.toDomain
 import ru.fefu.pokeabilityapp.domain.model.HistoryEntry
 import ru.fefu.pokeabilityapp.domain.repository.HistoryRepository
 import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository

@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import ru.fefu.pokeabilityapp.data.local.FavouriteDao
-import ru.fefu.pokeabilityapp.data.local.FavouriteEntity
-import ru.fefu.pokeabilityapp.data.local.toDomain
+import ru.fefu.pokeabilityapp.data.local.dao.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.entity.FavouriteEntity
+import ru.fefu.pokeabilityapp.data.local.entity.toDomain
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
 import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository

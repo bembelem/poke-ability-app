@@ -2,9 +2,9 @@ package ru.fefu.pokeabilityapp.data.mapper
 
 import ru.fefu.pokeabilityapp.data.dto.AbilityDto
 import ru.fefu.pokeabilityapp.data.dto.AbilityEntryDto
-import ru.fefu.pokeabilityapp.data.local.CachedAbilityEntity
-import ru.fefu.pokeabilityapp.data.local.NOT_IN_LIST
-import ru.fefu.pokeabilityapp.data.local.POKEMON_SEPARATOR
+import ru.fefu.pokeabilityapp.data.local.dao.NOT_IN_LIST
+import ru.fefu.pokeabilityapp.data.local.entity.CachedAbilityEntity
+import ru.fefu.pokeabilityapp.data.local.entity.POKEMON_SEPARATOR
 import ru.fefu.pokeabilityapp.domain.model.AbilityDetail
 import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 

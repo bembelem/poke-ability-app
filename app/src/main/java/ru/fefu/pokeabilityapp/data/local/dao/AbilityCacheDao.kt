@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
@@ -7,6 +7,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
+import ru.fefu.pokeabilityapp.data.local.entity.CachedAbilityEntity
 
 // listOrder = позиция в постраничном списке, -1 у найденных поиском и ещё не попавших в список
 const val NOT_IN_LIST = -1

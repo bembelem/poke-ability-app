@@ -16,9 +16,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import retrofit2.HttpException
 import retrofit2.Response
-import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
-import ru.fefu.pokeabilityapp.data.local.CachedAbilityEntity
+import ru.fefu.pokeabilityapp.data.local.dao.AbilityCacheDao
+import ru.fefu.pokeabilityapp.data.local.entity.CachedAbilityEntity
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 import ru.fefu.pokeabilityapp.fake.FakePokeApi
 import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository

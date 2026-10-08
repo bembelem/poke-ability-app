@@ -3,10 +3,10 @@ package ru.fefu.pokeabilityapp.data.mapper
 import ru.fefu.pokeabilityapp.data.dto.NamedResourceDto
 import ru.fefu.pokeabilityapp.data.dto.PokemonDto
 import ru.fefu.pokeabilityapp.data.dto.TypeDto
-import ru.fefu.pokeabilityapp.data.local.CachedPokemonEntity
-import ru.fefu.pokeabilityapp.data.local.NOT_IN_LIST
-import ru.fefu.pokeabilityapp.data.local.PokemonAbilityEntity
-import ru.fefu.pokeabilityapp.data.local.TypeEffectivenessEntity
+import ru.fefu.pokeabilityapp.data.local.dao.NOT_IN_LIST
+import ru.fefu.pokeabilityapp.data.local.entity.CachedPokemonEntity
+import ru.fefu.pokeabilityapp.data.local.entity.PokemonAbilityEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TypeEffectivenessEntity
 import ru.fefu.pokeabilityapp.domain.model.PokeType
 import ru.fefu.pokeabilityapp.domain.model.PokemonAbilityOption
 import ru.fefu.pokeabilityapp.domain.model.PokemonDetail

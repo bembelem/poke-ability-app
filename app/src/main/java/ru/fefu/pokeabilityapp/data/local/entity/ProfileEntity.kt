@@ -1,4 +1,4 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey

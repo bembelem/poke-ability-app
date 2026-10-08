@@ -1,12 +1,13 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import androidx.room.PrimaryKey
+import ru.fefu.pokeabilityapp.domain.model.AbilityItem
 
 @Entity(
-    tableName = "teams",
+    tableName = "favourites",
+    primaryKeys = ["profileId", "id"],
     foreignKeys = [
         ForeignKey(
             entity = ProfileEntity::class,
@@ -17,10 +18,12 @@ import androidx.room.PrimaryKey
     ],
     indices = [Index("profileId")]
 )
-data class TeamEntity(
-    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+data class FavouriteEntity(
     val profileId: Long,
+    val id: Int,
     val name: String,
-    val createdAt: Long = System.currentTimeMillis(),
-    val updatedAt: Long = System.currentTimeMillis()
+    val addedAt: Long = System.currentTimeMillis()
 )
+
+fun FavouriteEntity.toDomain(): AbilityItem =
+    AbilityItem(id, name)

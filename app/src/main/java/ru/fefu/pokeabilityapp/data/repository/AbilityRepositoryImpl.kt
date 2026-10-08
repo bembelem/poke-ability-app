@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import retrofit2.HttpException
-import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
-import ru.fefu.pokeabilityapp.data.local.toDetailOrNull
-import ru.fefu.pokeabilityapp.data.local.toItem
+import ru.fefu.pokeabilityapp.data.local.dao.AbilityCacheDao
+import ru.fefu.pokeabilityapp.data.local.entity.toDetailOrNull
+import ru.fefu.pokeabilityapp.data.local.entity.toItem
 import ru.fefu.pokeabilityapp.data.mapper.toCached
 import ru.fefu.pokeabilityapp.data.mapper.toCachedOrNull
 import ru.fefu.pokeabilityapp.data.service.PokeApiService

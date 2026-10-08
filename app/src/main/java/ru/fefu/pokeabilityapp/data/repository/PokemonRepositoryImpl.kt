@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import ru.fefu.pokeabilityapp.data.local.PokemonCacheDao
+import ru.fefu.pokeabilityapp.data.local.dao.PokemonCacheDao
 import ru.fefu.pokeabilityapp.data.mapper.toAbilityEntities
 import ru.fefu.pokeabilityapp.data.mapper.toCached
 import ru.fefu.pokeabilityapp.data.mapper.toCachedPokemonOrNull

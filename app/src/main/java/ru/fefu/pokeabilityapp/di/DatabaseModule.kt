@@ -7,10 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import ru.fefu.pokeabilityapp.data.local.AbilityCacheDao
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
-import ru.fefu.pokeabilityapp.data.local.FavouriteDao
-import ru.fefu.pokeabilityapp.data.local.HistoryDao
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_1_2
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_3_4
@@ -18,9 +15,12 @@ import ru.fefu.pokeabilityapp.data.local.MIGRATION_4_5
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_5_6
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_6_7
 import ru.fefu.pokeabilityapp.data.local.MIGRATION_7_8
-import ru.fefu.pokeabilityapp.data.local.PokemonCacheDao
-import ru.fefu.pokeabilityapp.data.local.ProfileDao
-import ru.fefu.pokeabilityapp.data.local.TeamDao
+import ru.fefu.pokeabilityapp.data.local.dao.AbilityCacheDao
+import ru.fefu.pokeabilityapp.data.local.dao.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.dao.HistoryDao
+import ru.fefu.pokeabilityapp.data.local.dao.PokemonCacheDao
+import ru.fefu.pokeabilityapp.data.local.dao.ProfileDao
+import ru.fefu.pokeabilityapp.data.local.dao.TeamDao
 import javax.inject.Singleton
 
 @Module

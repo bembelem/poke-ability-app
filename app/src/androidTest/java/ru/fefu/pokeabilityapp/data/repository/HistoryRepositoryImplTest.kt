@@ -13,8 +13,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
-import ru.fefu.pokeabilityapp.data.local.HistoryEntryEntity
-import ru.fefu.pokeabilityapp.data.local.ProfileEntity
+import ru.fefu.pokeabilityapp.data.local.entity.HistoryEntryEntity
+import ru.fefu.pokeabilityapp.data.local.entity.ProfileEntity
 import ru.fefu.pokeabilityapp.domain.model.AppSettings
 import ru.fefu.pokeabilityapp.fake.FakeSettingsRepository
 

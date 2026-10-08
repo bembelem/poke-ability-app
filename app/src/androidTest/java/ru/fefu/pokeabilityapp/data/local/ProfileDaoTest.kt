@@ -11,6 +11,8 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.fefu.pokeabilityapp.data.local.dao.ProfileDao
+import ru.fefu.pokeabilityapp.data.local.entity.ProfileEntity
 
 @RunWith(AndroidJUnit4::class)
 class ProfileDaoTest {

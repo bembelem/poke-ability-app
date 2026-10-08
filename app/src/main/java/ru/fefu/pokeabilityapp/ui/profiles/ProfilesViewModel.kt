@@ -50,7 +50,7 @@ class ProfilesViewModel @Inject constructor(
         }
     }
 
-    // последний профиль не удаляем: данным нужен владелец
+    // последний профиль не удаляем - данным нужен владелец
     fun delete(id: Long) {
         viewModelScope.launch {
             if (profileRepository.observeProfiles().first().size <= 1) return@launch

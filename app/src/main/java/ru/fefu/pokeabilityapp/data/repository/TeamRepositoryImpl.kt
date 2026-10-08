@@ -7,10 +7,10 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
-import ru.fefu.pokeabilityapp.data.local.TeamDao
-import ru.fefu.pokeabilityapp.data.local.TeamEntity
-import ru.fefu.pokeabilityapp.data.local.TeamSlotEntity
-import ru.fefu.pokeabilityapp.data.local.toDomain
+import ru.fefu.pokeabilityapp.data.local.dao.TeamDao
+import ru.fefu.pokeabilityapp.data.local.entity.TeamEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamSlotEntity
+import ru.fefu.pokeabilityapp.data.local.entity.toDomain
 import ru.fefu.pokeabilityapp.domain.model.Team
 import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository
 import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository

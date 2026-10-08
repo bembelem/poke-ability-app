@@ -1,26 +1,14 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.dao
 
 import androidx.room.Dao
-import androidx.room.Embedded
 import androidx.room.Insert
 import androidx.room.Query
-import androidx.room.Relation
 import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
-import ru.fefu.pokeabilityapp.domain.model.Team
-
-data class TeamWithSlots(
-    @Embedded val team: TeamEntity,
-    @Relation(parentColumn = "id", entityColumn = "teamId")
-    val slots: List<TeamSlotEntity>
-)
-
-fun TeamWithSlots.toDomain(): Team = Team(
-    id = team.id,
-    name = team.name,
-    slots = slots.sortedBy { it.position }.map { it.toDomain() }
-)
+import ru.fefu.pokeabilityapp.data.local.entity.TeamEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamSlotEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamWithSlots
 
 @Dao
 interface TeamDao {

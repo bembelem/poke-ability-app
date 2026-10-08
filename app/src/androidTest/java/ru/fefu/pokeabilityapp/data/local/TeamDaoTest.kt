@@ -14,6 +14,12 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import ru.fefu.pokeabilityapp.data.local.dao.TeamDao
+import ru.fefu.pokeabilityapp.data.local.entity.ProfileEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamSlotEntity
+import ru.fefu.pokeabilityapp.data.local.entity.TeamWithSlots
+import ru.fefu.pokeabilityapp.data.local.entity.toDomain
 
 @RunWith(AndroidJUnit4::class)
 class TeamDaoTest {

@@ -1,13 +1,12 @@
-package ru.fefu.pokeabilityapp.data.local
+package ru.fefu.pokeabilityapp.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import ru.fefu.pokeabilityapp.domain.model.HistoryEntry
 
 @Entity(
-    tableName = "history_entries",
+    tableName = "teams",
     foreignKeys = [
         ForeignKey(
             entity = ProfileEntity::class,
@@ -18,13 +17,10 @@ import ru.fefu.pokeabilityapp.domain.model.HistoryEntry
     ],
     indices = [Index("profileId")]
 )
-data class HistoryEntryEntity(
+data class TeamEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val profileId: Long,
-    val abilityId: Int,
-    val abilityName: String,
-    val viewedAt: Long
+    val name: String,
+    val createdAt: Long = System.currentTimeMillis(),
+    val updatedAt: Long = System.currentTimeMillis()
 )
-
-fun HistoryEntryEntity.toDomain(): HistoryEntry =
-    HistoryEntry(abilityId = abilityId, abilityName = abilityName, viewedAt = viewedAt)
