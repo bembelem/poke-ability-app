@@ -35,7 +35,7 @@ class ProfileRepositoryImpl @Inject constructor(
 
         val resolved = profiles.firstOrNull { it.id == activeId }?.id
             ?: profiles.firstOrNull()?.id
-            ?: dao.insert(ProfileEntity(name = DEFAULT_PROFILE_NAME))
+            ?: createDefaultProfiles()
 
         if (resolved != activeId) {
             settingsRepository.setActiveProfile(resolved)
@@ -43,7 +43,14 @@ class ProfileRepositoryImpl @Inject constructor(
         resolved
     }
 
+    private suspend fun createDefaultProfiles(): Long {
+        val id = dao.insert(ProfileEntity(name = DEFAULT_PROFILE_NAME))
+        dao.insert(ProfileEntity(name = SECOND_PROFILE_NAME))
+        return id
+    }
+
     private companion object {
         const val DEFAULT_PROFILE_NAME = "Тренер"
+        const val SECOND_PROFILE_NAME = "Эш"
     }
 }

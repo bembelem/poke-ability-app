@@ -8,10 +8,10 @@ import ru.fefu.pokeabilityapp.data.local.entity.ProfileEntity
 
 @Dao
 interface ProfileDao {
-    @Query("SELECT * FROM profiles ORDER BY createdAt")
+    @Query("SELECT * FROM profiles ORDER BY createdAt, id")
     fun observeAll(): Flow<List<ProfileEntity>>
 
-    @Query("SELECT * FROM profiles ORDER BY createdAt")
+    @Query("SELECT * FROM profiles ORDER BY createdAt, id")
     suspend fun getAll(): List<ProfileEntity>
 
     @Query("SELECT * FROM profiles WHERE id = :id")
