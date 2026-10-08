@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavouriteDao {
@@ -15,4 +16,7 @@ interface FavouriteDao {
 
     @Query("SELECT * FROM favourites ORDER BY addedAt DESC")
     suspend fun getAll(): List<FavouriteEntity>
+
+    @Query("SELECT * FROM favourites ORDER BY addedAt DESC")
+        fun observeAll(): Flow<List<FavouriteEntity>>
 }
