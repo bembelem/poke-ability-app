@@ -8,7 +8,19 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.local.AppDatabase
-import ru.fefu.pokeabilityapp.data.local.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_1_2
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_2_3
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_3_4
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_4_5
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_5_6
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_6_7
+import ru.fefu.pokeabilityapp.data.local.MIGRATION_7_8
+import ru.fefu.pokeabilityapp.data.local.dao.AbilityCacheDao
+import ru.fefu.pokeabilityapp.data.local.dao.FavouriteDao
+import ru.fefu.pokeabilityapp.data.local.dao.HistoryDao
+import ru.fefu.pokeabilityapp.data.local.dao.PokemonCacheDao
+import ru.fefu.pokeabilityapp.data.local.dao.ProfileDao
+import ru.fefu.pokeabilityapp.data.local.dao.TeamDao
 import javax.inject.Singleton
 
 @Module
@@ -22,10 +34,37 @@ object DatabaseModule {
             context,
             AppDatabase::class.java,
             "pokeability.db"
-        ).build()
+        )
+            .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+            .build()
 
     @Provides
     @Singleton
     fun provideFavouriteDao(db: AppDatabase): FavouriteDao =
         db.getFavouriteDao()
+
+    @Provides
+    @Singleton
+    fun provideProfileDao(db: AppDatabase): ProfileDao =
+        db.getProfileDao()
+
+    @Provides
+    @Singleton
+    fun provideTeamDao(db: AppDatabase): TeamDao =
+        db.getTeamDao()
+
+    @Provides
+    @Singleton
+    fun provideAbilityCacheDao(db: AppDatabase): AbilityCacheDao =
+        db.getAbilityCacheDao()
+
+    @Provides
+    @Singleton
+    fun provideHistoryDao(db: AppDatabase): HistoryDao =
+        db.getHistoryDao()
+
+    @Provides
+    @Singleton
+    fun providePokemonCacheDao(db: AppDatabase): PokemonCacheDao =
+        db.getPokemonCacheDao()
 }

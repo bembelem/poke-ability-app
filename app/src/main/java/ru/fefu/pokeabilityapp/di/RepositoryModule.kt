@@ -6,8 +6,18 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import ru.fefu.pokeabilityapp.data.repository.AbilityRepositoryImpl
 import ru.fefu.pokeabilityapp.data.repository.FavouriteRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.HistoryRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.PokemonRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.ProfileRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.SettingsRepositoryImpl
+import ru.fefu.pokeabilityapp.data.repository.TeamRepositoryImpl
 import ru.fefu.pokeabilityapp.domain.repository.AbilityRepository
 import ru.fefu.pokeabilityapp.domain.repository.FavouriteRepository
+import ru.fefu.pokeabilityapp.domain.repository.HistoryRepository
+import ru.fefu.pokeabilityapp.domain.repository.PokemonRepository
+import ru.fefu.pokeabilityapp.domain.repository.ProfileRepository
+import ru.fefu.pokeabilityapp.domain.repository.SettingsRepository
+import ru.fefu.pokeabilityapp.domain.repository.TeamRepository
 import javax.inject.Singleton
 
 @Module
@@ -25,4 +35,34 @@ abstract class RepositoryModule {
     abstract fun bindFavouriteRepository(
         impl: FavouriteRepositoryImpl
     ): FavouriteRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindSettingsRepository(
+        impl: SettingsRepositoryImpl
+    ): SettingsRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindProfileRepository(
+        impl: ProfileRepositoryImpl
+    ): ProfileRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindTeamRepository(
+        impl: TeamRepositoryImpl
+    ): TeamRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindHistoryRepository(
+        impl: HistoryRepositoryImpl
+    ): HistoryRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindPokemonRepository(
+        impl: PokemonRepositoryImpl
+    ): PokemonRepository
 }

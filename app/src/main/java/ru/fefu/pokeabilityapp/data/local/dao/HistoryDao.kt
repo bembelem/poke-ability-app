@@ -1,0 +1,29 @@
+package ru.fefu.pokeabilityapp.data.local.dao
+
+import androidx.room.Dao
+import androidx.room.Insert
+import androidx.room.Query
+import kotlinx.coroutines.flow.Flow
+import ru.fefu.pokeabilityapp.data.local.entity.HistoryEntryEntity
+
+@Dao
+interface HistoryDao {
+
+    @Query("SELECT * FROM history_entries WHERE profileId = :profileId ORDER BY viewedAt DESC")
+    fun observeAll(profileId: Long): Flow<List<HistoryEntryEntity>>
+
+    @Query("SELECT * FROM history_entries WHERE profileId = :profileId ORDER BY viewedAt DESC")
+    suspend fun getAll(profileId: Long): List<HistoryEntryEntity>
+
+    @Insert
+    suspend fun insert(entry: HistoryEntryEntity)
+
+    @Query("DELETE FROM history_entries WHERE profileId = :profileId AND abilityId = :abilityId")
+    suspend fun deleteFor(profileId: Long, abilityId: Int)
+
+    @Query("DELETE FROM history_entries WHERE profileId = :profileId")
+    suspend fun clear(profileId: Long)
+
+    @Query("DELETE FROM history_entries WHERE profileId = :profileId AND viewedAt < :before")
+    suspend fun deleteOlderThan(profileId: Long, before: Long)
+}
